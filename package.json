@@ -1,0 +1,56 @@
+{
+    "name": "dousic-webos",
+    "version": "1.0.0",
+    "description": "Dousic — Universal Media Platform for Creators (LG webOS TV)",
+    "author": "Dousic Media Group LLC",
+    "license": "UNLICENSED",
+    "private": true,
+    "main": "index.js",
+    "enact": {
+        "theme": "moonstone",
+        "// target": "Kept aligned with .enactrc to avoid divergent transpile targets.",
+        "target": [
+            "Chrome >= 69"
+        ]
+    },
+    "scripts": {
+        "serve": "enact serve",
+        "pack": "enact pack",
+        "pack-p": "enact pack -p && node scripts/patch-dist-html.js && node scripts/check-no-hlsjs.js",
+        "clean": "enact clean",
+        "test": "enact test --env=jsdom",
+        "test-watch": "enact test --watch --env=jsdom",
+        "lint": "enact lint --local --strict",
+        "lint-fix": "enact lint --fix --local",
+        "license": "enact license",
+        "preversion-check": "node scripts/check-version-sync.js",
+        "package": "npm run preversion-check && npm run pack-p && ares-package dist",
+        "deploy": "npm run package && ares-install com.dousic.app.dousic_$npm_package_version\\_all.ipk",
+        "launch": "ares-launch com.dousic.app.dousic",
+        "inspect": "ares-inspect --app com.dousic.app.dousic"
+    },
+    "engines": {
+        "node": ">=18"
+    },
+    "dependencies": {
+        "@enact/core": "^4.7.13",
+        "@enact/i18n": "^4.7.13",
+        "@enact/moonstone": "^4.5.6",
+        "@enact/spotlight": "^4.7.13",
+        "@enact/ui": "^4.7.13",
+        "@enact/webos": "^4.7.13",
+        "classnames": "^2.5.1",
+        "hls.js": "^1.5.17",
+        "ilib": "^14.21.1",
+        "prop-types": "^15.8.1",
+        "pusher-js": "^8.4.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "zustand": "^4.5.5"
+    },
+    "devDependencies": {
+        "@enact/cli": "^6.1.4",
+        "@types/node": "^20.12.7",
+        "eslint": "^8.57.0"
+    }
+}

@@ -1,0 +1,48 @@
+{
+	"// --- Dousic Enact build configuration ---": "",
+	"// Target webOS 5.0+ (2020 LG TVs) as minimum supported version.": "",
+	"// webOS 5.0 ships Chromium 68, so we target Chrome >= 69 to keep the": "",
+	"// Babel output within reach. CSS Grid (used in the Browse panel) is": "",
+	"// Chromium 57+, well within this window.": "",
+	"// Relative asset paths (publicPath './') are required because webOS": "",
+	"// apps run from file:// — absolute paths break on the TV.": "",
+
+	"theme": "moonstone",
+
+	"// `template` forces Enact CLI 6.x to pick up the project-root index.html": "",
+	"// as the webpack HtmlWebpackPlugin template. Without this, recent Enact CLI": "",
+	"// versions silently fall back to the default template, dropping the custom": "",
+	"// CSP meta tag, the inline splash, and the TV viewport meta. (See B2 in": "",
+	"// DOUSIC_WEBOS_AUDIT_AND_PATCHES.md.)": "",
+	"template": "./index.html",
+
+	"target": [
+		"Chrome >= 69"
+	],
+
+	"publicPath": "./",
+
+	"isomorphic": false,
+
+	"proxy": "",
+
+	"fontGenerator": "./src/styles/font-override.js",
+
+	"screenTypes": [
+		{
+			"name": "fhd",
+			"pxPerRem": 24,
+			"width": 1920,
+			"height": 1080,
+			"aspectRatioName": "hdtv",
+			"base": true
+		},
+		{
+			"name": "uhd",
+			"pxPerRem": 48,
+			"width": 3840,
+			"height": 2160,
+			"aspectRatioName": "hdtv"
+		}
+	]
+}

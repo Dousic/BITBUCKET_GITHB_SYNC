@@ -1,0 +1,38 @@
+@import '../styles/variables.less';
+
+.banner {
+	position: fixed;
+	top: @spacing-lg;
+	left: 50%;
+	transform: translateX(-50%);
+	background: rgba(10, 10, 10, 0.97);
+	border: 1px solid @color-warning;
+	padding: @spacing-sm @spacing-lg;
+	border-radius: 999px;
+	display: flex;
+	align-items: center;
+	gap: @spacing-sm;
+	z-index: @z-notification;
+	// `backdrop-filter: blur(16px)` removed — too expensive on webOS 4/5 GPUs.
+	// Audit H3.
+	box-shadow: @shadow-card-hi;
+
+	.dot {
+		width: 10px;
+		height: 10px;
+		background: @color-warning;
+		border-radius: 50%;
+		animation: blink 1.6s ease-in-out infinite;
+	}
+
+	.text {
+		color: @color-text;
+		font-size: @font-sm;
+		font-weight: @font-weight-medium;
+	}
+}
+
+@keyframes blink {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.3; }
+}

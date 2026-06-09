@@ -1,0 +1,148 @@
+@import './variables.less';
+
+// =========================================================================
+// Reset + base
+// =========================================================================
+
+*, *::before, *::after {
+	box-sizing: border-box;
+}
+
+html, body, #root {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	background: @color-bg;
+	color: @color-text;
+	font-family: @font-family-base;
+	font-size: @font-md;
+	line-height: @line-height-normal;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	overflow: hidden;
+}
+
+// Allow body scroll on TV viewport only (emulator browser is 1920x1080)
+body {
+	width: 1920px;
+	height: 1080px;
+}
+
+// =========================================================================
+// Typography defaults
+// =========================================================================
+
+h1, h2, h3, h4, h5, h6, p {
+	margin: 0;
+}
+
+h1 { font-size: @font-xxl; font-weight: @font-weight-bold; letter-spacing: -0.02em; }
+h2 { font-size: @font-xl;  font-weight: @font-weight-bold; letter-spacing: -0.01em; }
+h3 { font-size: @font-lg;  font-weight: @font-weight-medium; }
+h4 { font-size: @font-md;  font-weight: @font-weight-medium; }
+h5 { font-size: @font-sm;  font-weight: @font-weight-medium; }
+
+p  { font-size: @font-md; color: @color-text-muted; }
+
+button { font-family: inherit; }
+
+// =========================================================================
+// TV focus behavior
+// =========================================================================
+//
+// We suppress browser :hover effects in pointer-less remote mode and rely
+// entirely on Spotlight's .spottable-focused class.
+
+@media (hover: none) {
+	*:hover {
+		// Prevent hover states from firing on remote-only users
+		background-color: inherit !important;
+		transform: none !important;
+	}
+}
+
+// Smooth scale transition for focused elements
+.spottable-focused {
+	transition: transform @duration-normal @easing-out,
+		box-shadow @duration-normal @easing-out;
+}
+
+// Disable text selection globally — TV UX should never select text
+* {
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+input, textarea {
+	-webkit-user-select: auto;
+	user-select: auto;
+}
+
+// =========================================================================
+// Scrollbar (webOS Chromium supports this)
+// =========================================================================
+
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: @color-text-subtle;
+	border-radius: @radius-sm;
+}
+
+// =========================================================================
+// Moonstone theme overrides
+// =========================================================================
+
+.moonstone {
+	background-color: @color-bg !important;
+}
+
+// Override Moonstone's default accent with Dousic red
+.moonstone {
+	--moon-spotlight-focus-accent-color: @color-brand-primary;
+	--moon-spotlight-focus-color: @color-brand-primary;
+}
+
+// =========================================================================
+// Utility classes
+// =========================================================================
+
+.truncate {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.clamp-2 {
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.clamp-3 {
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0,0,0,0);
+	white-space: nowrap;
+	border: 0;
+}

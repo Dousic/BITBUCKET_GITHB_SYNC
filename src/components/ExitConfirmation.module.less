@@ -1,0 +1,47 @@
+@import '../styles/variables.less';
+
+.overlay {
+	position: fixed;
+	top: 0; right: 0; bottom: 0; left: 0;
+	background: @color-bg-scrim;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: @z-modal;
+	animation: fadeIn @duration-normal @easing-out;
+}
+
+.dialog {
+	background: @color-bg-elevated;
+	border-radius: @radius-xl;
+	padding: @spacing-xxl;
+	min-width: 640px;
+	max-width: 800px;
+	text-align: center;
+	box-shadow: @shadow-card-hi;
+
+	.title {
+		font-size: @font-xl;
+		font-weight: @font-weight-bold;
+		color: @color-text;
+		margin-bottom: @spacing-md;
+	}
+
+	.message {
+		font-size: @font-md;
+		color: @color-text-muted;
+		line-height: @line-height-normal;
+		margin-bottom: @spacing-xl;
+	}
+
+	.actions {
+		display: flex;
+		gap: @spacing-md;
+		justify-content: center;
+	}
+}
+
+@keyframes fadeIn {
+	from { opacity: 0; transform: scale(0.96); }
+	to   { opacity: 1; transform: scale(1); }
+}

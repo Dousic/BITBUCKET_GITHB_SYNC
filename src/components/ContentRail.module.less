@@ -1,0 +1,46 @@
+@import '../styles/variables.less';
+
+.rail {
+	margin-bottom: @spacing-xl;
+	position: relative;
+
+	.title {
+		font-size: @font-lg;
+		font-weight: @font-weight-bold;
+		color: @color-text;
+		letter-spacing: -0.01em;
+		margin-bottom: @spacing-md;
+		padding-left: @safe-area-side;
+	}
+
+	// Moonstone Scroller needs a definite height to compute its scrollable
+	// region. `height: auto` produced intermittent panning bugs on the
+	// emulator. Per-size heights account for card + 80px focus-scale padding
+	// declared on .track below (40px top + 40px bottom).
+	// Audit B5.
+	&.size-small  .scroller { height: 280px; }   // small  card ~200px + 80px
+	&.size-medium .scroller { height: 380px; }   // medium card ~300px + 80px
+	&.size-large  .scroller { height: 580px; }   // large  card ~500px + 80px
+	&.size-wide   .scroller { height: 360px; }   // wide   card ~280px + 80px
+	// Default — used if no size class matches.
+	.scroller { height: 380px; }
+
+	.track {
+		display: flex;
+		gap: @spacing-md;
+		padding: @spacing-md @safe-area-side;
+		// Extra top/bottom padding so focus scale transform isn't clipped
+		padding-top: 40px;
+		padding-bottom: 40px;
+	}
+
+	.slot {
+		flex-shrink: 0;
+	}
+
+	.empty {
+		padding: @spacing-xl @safe-area-side;
+		color: @color-text-subtle;
+		font-size: @font-sm;
+	}
+}

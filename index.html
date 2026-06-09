@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, initial-scale=1.0, user-scalable=no" />
+    <meta name="description" content="Dousic — Universal Media Platform for Creators on LG webOS" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <!--
+      Content Security Policy
+
+      Enact apps run under file:// on webOS, so 'self' resolves to the app's
+      own origin. connect-src allows:
+        - REST API (http/https) on both localhost (dev) and api.dousic.media (prod)
+        - WebSocket (ws/wss) for Reverb on localhost:8080 (dev) and api.dousic.media (prod)
+        - CDN for HLS streams (https://*.dousic-cdn.com placeholder, plus the
+          public HLS demo hosts used in MVP seed content)
+
+      Note on script-src 'unsafe-eval':
+        Enact's dev server and the @enact/cli test runner require it. For a
+        hardened production IPK you can drop 'unsafe-eval' from script-src —
+        React 18 prod builds do not evaluate strings at runtime. To tighten:
+          1. Fork this CSP into a prod-only variant via a build-time template,
+             or find-replace during `enact pack -p` (see scripts/ for pattern)
+          2. Remove 'unsafe-eval' from script-src in that variant
+          3. Run full QA against prod IPK — a regression here would surface
+             as a broken Enact internal
+        This is tracked as M-9 in the audit handoff.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self';
+               script-src 'self' 'unsafe-inline' 'unsafe-eval';
+               connect-src 'self'
+                 http://localhost:8000 http://localhost:8080
+                 ws://localhost:8080
+                 https://api.dousic.media https://staging.dousic.media https://dousic.media
+                 wss://ws.dousic.media;
+               img-src 'self' https: data: blob:;
+               style-src 'self' 'unsafe-inline';
+               font-src 'self' data:;
+               media-src 'self' https: blob:;
+               frame-src 'none';
+               object-src 'none';
+               base-uri 'self';" />
+
+    <title>Dousic</title>
+
+    <!--
+      Inline splash — visible within ~100ms on a 2019 TV.
+      Hides automatically when Enact mounts content into #root.
+    -->
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1920px;
+            height: 1080px;
+            background: #0a0a0a;
+            color: #ffffff;
+            font-family: 'LG Smart UI', 'Museo Sans', sans-serif;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        #root {
+            width: 100%;
+            height: 100%;
+        }
+
+        #dousic-splash {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: radial-gradient(ellipse at center, #1a0e1a 0%, #0a0a0a 70%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 400ms ease-out;
+        }
+
+        #dousic-splash.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #dousic-splash .mark {
+            font-size: 128px;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            color: #ffffff;
+            text-shadow: 0 8px 40px rgba(255, 0, 255, 0.4);
+        }
+
+        #dousic-splash .mark .accent {
+            color: #FF00FF;
+        }
+
+        #dousic-splash .tagline {
+            margin-top: 16px;
+            font-size: 24px;
+            color: #8a8a8a;
+            letter-spacing: 0.02em;
+        }
+
+        #dousic-splash .pulse-ring {
+            margin-top: 64px;
+            width: 64px;
+            height: 64px;
+            border: 3px solid rgba(255, 0, 255, 0.3);
+            border-top-color: #FF00FF;
+            border-radius: 50%;
+            animation: dousic-spin 900ms linear infinite;
+        }
+
+        @keyframes dousic-spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <div id="dousic-splash">
+        <div class="mark">dousic<span class="accent">.</span></div>
+        <div class="tagline">Universal Media Platform for Creators</div>
+        <div class="pulse-ring" role="progressbar" aria-label="Loading"></div>
+    </div>
+</body>
+
+</html>

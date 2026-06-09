@@ -1,0 +1,156 @@
+// =========================================================================
+// Dousic Design System — Variables
+// =========================================================================
+//
+// All styles derive from this file. Values calibrated for:
+//   - 1920×1080 TV viewport (Enact scales to 4K automatically)
+//   - 10-foot viewing distance (2.5–3.5m from screen)
+//   - Dark mode primary (TV rooms are darker than desk environments)
+//   - Brand palette: bold black base, magenta primary (#FF00FF)
+
+// -------------------- Brand colors --------------------
+
+@color-brand-primary: #FF00FF;
+@color-brand-primary-dim: #CC00CC;
+@color-brand-primary-bright: #FF55FF;
+
+@color-brand-black: #0a0a0a;
+@color-brand-white: #ffffff;
+
+// -------------------- Surfaces --------------------
+
+@color-bg: #0a0a0a;
+@color-bg-elevated: #141414;
+@color-bg-card: #1a1a1a;
+@color-bg-card-focused: #2a2a2a;
+@color-bg-overlay: rgba(10, 10, 10, 0.92);
+@color-bg-scrim: rgba(0, 0, 0, 0.78);
+
+// Radial gradient used in hero + boot screens
+@gradient-hero: radial-gradient(ellipse at center, #1a0e1a 0%, #0a0a0a 70%);
+@gradient-card: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.85) 100%);
+
+// -------------------- Text --------------------
+
+@color-text: #ffffff;
+@color-text-muted: #a8a8a8;
+@color-text-subtle: #6b6b6b;
+@color-text-disabled: #4a4a4a;
+@color-text-accent: @color-brand-primary;
+
+// -------------------- Semantic --------------------
+
+@color-success: #00c853;
+@color-warning: #ffab00;
+@color-error: #ff3d00;
+@color-live: @color-brand-primary;
+@color-info: #448aff;
+
+// -------------------- Focus ring (Spotlight target) --------------------
+
+@focus-ring-color: @color-brand-white;
+@focus-ring-width: 4px;
+@focus-ring-inset: 0;
+@focus-ring-glow: 0 0 0 @focus-ring-width @focus-ring-color, 0 8px 40px rgba(255, 0, 255, 0.35);
+
+// -------------------- Typography --------------------
+//
+// LG TV default font is LG Smart UI. We declare it first, fall back to
+// Museo Sans (a common TV-industry default), then system sans-serif.
+
+@font-family-base: 'LG Smart UI', 'Museo Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+@font-family-mono: 'LG Smart UI Mono', 'SF Mono', Menlo, monospace;
+
+// Sizes — calibrated for 1920×1080. Enact scales these for 4K.
+@font-xs:  16px;
+@font-sm:  20px;
+@font-md:  24px;
+@font-lg:  32px;
+@font-xl:  40px;
+@font-xxl: 56px;
+@font-display: 88px;
+
+@font-weight-normal: 400;
+@font-weight-medium: 500;
+@font-weight-bold:   700;
+@font-weight-black:  900;
+
+@line-height-tight: 1.1;
+@line-height-normal: 1.4;
+@line-height-loose: 1.6;
+
+// -------------------- Spacing --------------------
+//
+// Based on an 8px grid, doubled for TV scale.
+
+@spacing-xs:  8px;
+@spacing-sm:  16px;
+@spacing-md:  24px;
+@spacing-lg:  40px;
+@spacing-xl:  64px;
+@spacing-xxl: 96px;
+
+// -------------------- Layout --------------------
+
+@viewport-width: 1920px;
+@viewport-height: 1080px;
+
+@nav-width: 240px;
+@nav-width-collapsed: 96px;
+
+@safe-area-top:    60px; // LG guideline: 5% from top edge
+@safe-area-bottom: 60px;
+@safe-area-side:   96px;
+
+// -------------------- Radius --------------------
+
+@radius-sm: 4px;
+@radius-md: 8px;
+@radius-lg: 16px;
+@radius-xl: 24px;
+
+// -------------------- Motion --------------------
+
+@duration-fast:   150ms;
+@duration-normal: 250ms;
+@duration-slow:   400ms;
+
+@easing-out:   cubic-bezier(0.16, 1, 0.3, 1);
+@easing-inout: cubic-bezier(0.65, 0, 0.35, 1);
+
+// -------------------- Z-index --------------------
+
+@z-base:         1;
+@z-nav:          100;
+@z-modal:        200;
+@z-notification: 300;
+@z-tooltip:      400;
+@z-splash:       9999;
+
+// -------------------- Shadows --------------------
+
+@shadow-card:      0 4px 20px rgba(0, 0, 0, 0.4);
+@shadow-card-hi:   0 12px 48px rgba(0, 0, 0, 0.6);
+@shadow-glow-primary:  0 0 48px rgba(255, 0, 255, 0.4);
+
+// -------------------- Utility mixins --------------------
+
+.truncate() {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.clamp-2() {
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.clamp-3() {
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}

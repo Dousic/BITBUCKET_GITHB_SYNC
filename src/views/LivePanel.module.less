@@ -1,0 +1,111 @@
+@import '../styles/variables.less';
+
+.panel {
+	width: 100vw;
+	height: 100vh;
+	background: @color-bg;
+	overflow: hidden;
+}
+
+.content {
+	margin-left: @nav-width-collapsed;
+	width: calc(100vw - @nav-width-collapsed);
+	height: 100vh;
+	padding: @safe-area-top @safe-area-side @safe-area-bottom;
+}
+
+.header {
+	margin-bottom: @spacing-xl;
+
+	.title {
+		font-size: @font-xxl;
+		font-weight: @font-weight-black;
+		color: @color-text;
+		letter-spacing: -0.03em;
+		display: flex;
+		align-items: center;
+		gap: @spacing-md;
+	}
+
+	.liveDot {
+		width: 16px;
+		height: 16px;
+		background: @color-brand-primary;
+		border-radius: 50%;
+		animation: livePulse 1.6s ease-in-out infinite;
+		box-shadow: 0 0 0 8px rgba(255, 0, 255, 0.2);
+	}
+
+	.subtitle {
+		font-size: @font-md;
+		color: @color-text-muted;
+		margin-top: @spacing-xs;
+	}
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: @spacing-lg @spacing-md;
+	padding: @spacing-md 0 @spacing-xxl;
+}
+
+.empty {
+	text-align: center;
+	padding: @spacing-xxl;
+	max-width: 640px;
+	margin: 0 auto;
+
+	.emptyIcon {
+		width: 128px;
+		height: 128px;
+		margin: 0 auto @spacing-lg;
+		border-radius: 50%;
+		border: 3px solid @color-bg-card;
+		position: relative;
+
+		&::before {
+			content: '';
+			position: absolute;
+			top: 32px; right: 32px; bottom: 32px; left: 32px;
+			border-radius: 50%;
+			background: @color-bg-card;
+		}
+	}
+
+	.emptyTitle {
+		font-size: @font-xl;
+		color: @color-text;
+		margin-bottom: @spacing-sm;
+	}
+
+	.emptyMessage {
+		font-size: @font-md;
+		color: @color-text-muted;
+	}
+}
+
+.loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 400px;
+}
+
+.spinner {
+	width: 64px;
+	height: 64px;
+	border: 4px solid rgba(255, 255, 255, 0.1);
+	border-top-color: @color-brand-primary;
+	border-radius: 50%;
+	animation: spin 900ms linear infinite;
+}
+
+@keyframes livePulse {
+	0%, 100% { opacity: 1; transform: scale(1); }
+	50%      { opacity: 0.5; transform: scale(0.85); }
+}
+
+@keyframes spin {
+	to { transform: rotate(360deg); }
+}

@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+build/
+*.ipk
+*.ipk.tmp
+
+# Enact cache
+.enact-build-cache
+coverage
+
+# Env
+.env
+.env.local
+.env.development
+.env.production.local
+
+# Editor
+.vscode/settings.json
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log
+
+# webOS signing (NEVER COMMIT these)
+*.crt
+*.key
+*.pem
+webos-seller-*.json
+
+# B-NEW-4: root appinfo.json is a vestigial duplicate of webos-meta/appinfo.json.
+# Canonical source is webos-meta/appinfo.json; Enact's pack step emits the build
+# copy into dist/. Do not re-add a root copy without deleting this line.
+/appinfo.json
+
+*.zip

@@ -1,0 +1,46 @@
+@import '../styles/variables.less';
+
+.errorBoundary {
+	position: fixed;
+	top: 0; right: 0; bottom: 0; left: 0;
+	background: @color-bg;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 99999;
+
+	.content {
+		max-width: 720px;
+		text-align: center;
+		padding: @spacing-xxl;
+
+		.title {
+			font-size: 48px;
+			font-weight: 700;
+			color: @color-text;
+			margin-bottom: @spacing-lg;
+			letter-spacing: -0.02em;
+		}
+
+		.message {
+			font-size: 24px;
+			color: @color-text-muted;
+			line-height: 1.5;
+			margin-bottom: @spacing-xl;
+		}
+
+		.actions {
+			display: flex;
+			gap: @spacing-md;
+			justify-content: center;
+			margin-bottom: @spacing-xl;
+		}
+
+		.errorCode {
+			font-size: 16px;
+			color: @color-text-subtle;
+			font-family: monospace;
+			opacity: 0.6;
+		}
+	}
+}

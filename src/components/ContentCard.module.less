@@ -1,0 +1,155 @@
+@import '../styles/variables.less';
+
+.card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	cursor: pointer;
+	outline: none;
+	background: transparent;
+	transition: transform @duration-normal @easing-out;
+	will-change: transform;
+
+	.thumbnail {
+		position: relative;
+		width: 100%;
+		background: @color-bg-card;
+		overflow: hidden;
+		border-radius: @radius-md;
+	}
+
+	.image {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
+	.placeholder {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: linear-gradient(135deg, @color-brand-primary-dim 0%, @color-brand-black 100%);
+		color: @color-brand-white;
+		font-size: @font-xxl;
+		font-weight: @font-weight-black;
+		letter-spacing: -0.02em;
+	}
+
+	.gradient {
+		position: absolute;
+		top: 0; right: 0; bottom: 0; left: 0;
+		background: @gradient-card;
+		opacity: 0.6;
+		transition: opacity @duration-normal @easing-out;
+		pointer-events: none;
+	}
+
+	.meta {
+		padding: @spacing-sm @spacing-xs 0;
+	}
+
+	.title {
+		font-size: @font-sm;
+		font-weight: @font-weight-medium;
+		color: @color-text;
+		line-height: @line-height-tight;
+		.clamp-2();
+	}
+
+	.subtitle {
+		font-size: @font-xs;
+		color: @color-text-muted;
+		margin-top: 4px;
+		.truncate();
+	}
+
+	.liveBadge {
+		position: absolute;
+		top: @spacing-sm;
+		left: @spacing-sm;
+		background: @color-brand-primary;
+		color: @color-brand-white;
+		padding: 4px 10px;
+		border-radius: @radius-sm;
+		font-size: @font-xs;
+		font-weight: @font-weight-bold;
+		letter-spacing: 0.08em;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+
+		.liveDot {
+			width: 8px;
+			height: 8px;
+			background: @color-brand-white;
+			border-radius: 50%;
+			animation: livePulse 1.6s ease-in-out infinite;
+		}
+	}
+
+	.viewerCount {
+		position: absolute;
+		bottom: @spacing-sm;
+		left: @spacing-sm;
+		background: rgba(0, 0, 0, 0.75);
+		color: @color-brand-white;
+		padding: 4px 10px;
+		border-radius: @radius-sm;
+		font-size: @font-xs;
+		font-weight: @font-weight-medium;
+	}
+
+	.duration {
+		position: absolute;
+		bottom: @spacing-sm;
+		right: @spacing-sm;
+		background: rgba(0, 0, 0, 0.8);
+		color: @color-brand-white;
+		padding: 4px 10px;
+		border-radius: @radius-sm;
+		font-size: @font-xs;
+		font-weight: @font-weight-medium;
+	}
+
+	// -------- Focus state --------
+
+	&:global(.spottable-focused),
+	&.focused {
+		transform: scale(1.08);
+		z-index: 10;
+
+		.thumbnail {
+			box-shadow: @focus-ring-glow;
+			outline: @focus-ring-width solid @focus-ring-color;
+			outline-offset: 0;
+		}
+
+		.gradient {
+			opacity: 0.3;
+		}
+
+		.title {
+			color: @color-brand-white;
+		}
+	}
+}
+
+// -------- Sizes --------
+
+.small .thumbnail  { aspect-ratio: 16 / 9; }
+.medium .thumbnail { aspect-ratio: 16 / 9; }
+.large .thumbnail  { aspect-ratio: 2 / 3;  }
+.wide .thumbnail   { aspect-ratio: 21 / 9; }
+
+.small  { width: 240px; }
+.medium { width: 360px; }
+.large  { width: 320px; }
+.wide   { width: 600px; }
+
+@keyframes livePulse {
+	0%, 100% { opacity: 1; transform: scale(1); }
+	50%      { opacity: 0.4; transform: scale(0.85); }
+}

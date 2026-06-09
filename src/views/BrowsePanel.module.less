@@ -1,0 +1,109 @@
+@import '../styles/variables.less';
+
+.panel {
+	width: 100vw;
+	height: 100vh;
+	background: @color-bg;
+	overflow: hidden;
+}
+
+.content {
+	margin-left: @nav-width-collapsed;
+	width: calc(100vw - @nav-width-collapsed);
+	height: 100vh;
+	padding: @safe-area-top @safe-area-side @safe-area-bottom;
+}
+
+.header {
+	margin-bottom: @spacing-lg;
+
+	.title {
+		font-size: @font-xxl;
+		font-weight: @font-weight-black;
+		color: @color-text;
+		letter-spacing: -0.03em;
+	}
+}
+
+.chipRow {
+	display: flex;
+	gap: @spacing-sm;
+	margin-bottom: @spacing-xl;
+	padding: @spacing-sm 0;
+	flex-wrap: wrap;
+}
+
+.chip {
+	padding: @spacing-sm @spacing-lg;
+	border-radius: 999px;
+	background: @color-bg-card;
+	color: @color-text-muted;
+	font-size: @font-sm;
+	font-weight: @font-weight-medium;
+	cursor: pointer;
+	outline: none;
+	transition: all @duration-normal @easing-out;
+
+	&:global(.spottable-focused) {
+		outline: @focus-ring-width solid @color-brand-white;
+		transform: scale(1.08);
+		color: @color-text;
+	}
+
+	&.active {
+		background: @color-brand-primary;
+		color: @color-brand-white;
+	}
+}
+
+.gridWrap {
+	min-height: 0;
+}
+
+// True 2D grid — 4 columns on FHD, 4 columns on UHD (Enact's rem scaling
+// makes cells visually bigger). `repeat(4, 1fr)` is deliberately fixed:
+// `repeat(auto-fill, minmax(360px, 1fr))` would produce ~10 columns on
+// UHD's literal pixel viewport, which doesn't match what a 10-foot UI
+// should look like.
+//
+// Cards stretch to fill their grid cell. ContentCard's `.medium { width:
+// 360px }` has specificity (0,1,0). To beat it reliably we double the
+// class — `.grid.grid > *` is (0,2,0). This avoids relying on CSS-bundle
+// source-order from import-graph ordering, which webpack treats as an
+// implementation detail.
+.grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: @spacing-xl @spacing-md;
+	// Extra top padding so focus-scale transform isn't clipped by Scroller.
+	padding: 40px @safe-area-side @spacing-xxl;
+}
+
+.grid.grid > * { width: 100%; }
+
+.empty {
+	color: @color-text-subtle;
+	font-size: @font-md;
+	padding: @spacing-xxl 0;
+	text-align: center;
+}
+
+.loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 400px;
+}
+
+.spinner {
+	width: 64px;
+	height: 64px;
+	border: 4px solid rgba(255, 255, 255, 0.1);
+	border-top-color: @color-brand-primary;
+	border-radius: 50%;
+	animation: spin 900ms linear infinite;
+}
+
+@keyframes spin {
+	to { transform: rotate(360deg); }
+}

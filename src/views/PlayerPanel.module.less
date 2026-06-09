@@ -1,0 +1,229 @@
+@import '../styles/variables.less';
+
+.panel {
+	width: 100vw;
+	height: 100vh;
+	background: #000;
+	overflow: hidden;
+}
+
+.playerContainer {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+.loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+}
+
+.spinner {
+	width: 80px;
+	height: 80px;
+	border: 4px solid rgba(255, 255, 255, 0.15);
+	border-top-color: @color-brand-primary;
+	border-radius: 50%;
+	animation: spin 900ms linear infinite;
+}
+
+.errorView {
+	position: fixed;
+	top: 0; right: 0; bottom: 0; left: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: @spacing-xl;
+	text-align: center;
+	color: @color-text;
+
+	h1 { font-size: @font-xl; margin-bottom: @spacing-md; }
+	p { font-size: @font-md; color: @color-text-muted; margin-bottom: @spacing-lg; }
+
+	button {
+		background: @color-brand-primary;
+		color: @color-brand-white;
+		border: none;
+		padding: @spacing-sm @spacing-xl;
+		border-radius: @radius-md;
+		font-size: @font-sm;
+		font-weight: @font-weight-bold;
+	}
+}
+
+.controlsOverlay {
+	position: absolute;
+	top: 0; right: 0; bottom: 0; left: 0;
+	opacity: 0;
+	transition: opacity @duration-normal @easing-out;
+	pointer-events: none;
+
+	&.visible {
+		opacity: 1;
+		pointer-events: auto;
+	}
+}
+
+.controls {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	background: linear-gradient(
+		180deg,
+		rgba(0,0,0,0.8) 0%,
+		transparent 20%,
+		transparent 60%,
+		rgba(0,0,0,0.9) 100%
+	);
+}
+
+.topBar {
+	display: flex;
+	align-items: center;
+	gap: @spacing-lg;
+	padding: @spacing-lg @safe-area-side;
+}
+
+.titleBlock {
+	flex: 1;
+	min-width: 0;
+}
+
+.contentTitle {
+	font-size: @font-lg;
+	font-weight: @font-weight-bold;
+	color: @color-text;
+	.truncate();
+}
+
+.creator {
+	font-size: @font-sm;
+	color: @color-text-muted;
+	margin-top: 4px;
+}
+
+.liveIndicator {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background: @color-brand-primary;
+	color: @color-brand-white;
+	padding: 6px 14px;
+	border-radius: @radius-sm;
+	font-size: @font-xs;
+	font-weight: @font-weight-bold;
+	letter-spacing: 0.08em;
+
+	.liveDot {
+		width: 10px;
+		height: 10px;
+		background: @color-brand-white;
+		border-radius: 50%;
+		animation: livePulse 1.6s ease-in-out infinite;
+	}
+}
+
+.bottomBar {
+	display: flex;
+	flex-direction: column;
+	gap: @spacing-md;
+	padding: @spacing-xl @safe-area-side;
+}
+
+.transportRow {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: @spacing-lg;
+}
+
+.progressRow {
+	display: flex;
+	align-items: center;
+	gap: @spacing-md;
+
+	.timeLabel {
+		font-size: @font-sm;
+		color: @color-text;
+		font-variant-numeric: tabular-nums;
+		min-width: 80px;
+	}
+
+	.progressTrack {
+		flex: 1;
+		position: relative;
+		height: 6px;
+		background: rgba(255, 255, 255, 0.2);
+		border-radius: 3px;
+	}
+
+	.progressFill {
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		background: @color-brand-primary;
+		border-radius: 3px;
+		transition: width @duration-fast linear;
+	}
+
+	.progressHandle {
+		position: absolute;
+		top: 50%;
+		width: 18px;
+		height: 18px;
+		margin-left: -9px;
+		background: @color-brand-white;
+		border-radius: 50%;
+		transform: translateY(-50%);
+		box-shadow: @shadow-card;
+	}
+}
+
+// Icon buttons
+.iconButton {
+	width: 80px;
+	height: 80px;
+	border-radius: 50%;
+	background: rgba(0, 0, 0, 0.6);
+	cursor: pointer;
+	outline: none;
+	transition: all @duration-normal @easing-out;
+	position: relative;
+
+	&::before {
+		content: '';
+		position: absolute;
+		top: 20px; right: 20px; bottom: 20px; left: 20px;
+		background: @color-brand-white;
+	}
+
+	&:global(.spottable-focused) {
+		background: @color-brand-primary;
+		transform: scale(1.1);
+		outline: @focus-ring-width solid @color-brand-white;
+		box-shadow: @shadow-glow-primary;
+	}
+
+	// Icon masks
+	&.icon-back::before     { mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z'/></svg>") center/contain no-repeat; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z'/></svg>") center/contain no-repeat; }
+	&.icon-play::before     { mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M8 5v14l11-7z'/></svg>") center/contain no-repeat; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M8 5v14l11-7z'/></svg>") center/contain no-repeat; }
+	&.icon-pause::before    { mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M6 5h4v14H6zm8 0h4v14h-4z'/></svg>") center/contain no-repeat; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M6 5h4v14H6zm8 0h4v14h-4z'/></svg>") center/contain no-repeat; }
+	&.icon-rewind::before   { mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z'/></svg>") center/contain no-repeat; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z'/></svg>") center/contain no-repeat; }
+	&.icon-forward::before  { mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z'/></svg>") center/contain no-repeat; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z'/></svg>") center/contain no-repeat; }
+}
+
+@keyframes livePulse {
+	0%, 100% { opacity: 1; transform: scale(1); }
+	50%      { opacity: 0.4; transform: scale(0.85); }
+}
+
+@keyframes spin {
+	to { transform: rotate(360deg); }
+}

@@ -1,0 +1,100 @@
+@import '../styles/variables.less';
+
+.panel {
+	width: 100vw;
+	height: 100vh;
+	background: @color-bg;
+	overflow: hidden;
+}
+
+.content {
+	height: 100vh;
+	max-width: 960px;
+	margin: 0 auto;
+	padding: @safe-area-top @safe-area-side @safe-area-bottom;
+}
+
+.header {
+	margin-bottom: @spacing-xl;
+
+	.title {
+		font-size: @font-xxl;
+		font-weight: @font-weight-black;
+		color: @color-text;
+		letter-spacing: -0.03em;
+	}
+}
+
+.section {
+	margin-bottom: @spacing-xl;
+
+	.sectionTitle {
+		font-size: @font-lg;
+		font-weight: @font-weight-bold;
+		color: @color-text;
+		margin-bottom: @spacing-md;
+		letter-spacing: -0.01em;
+	}
+
+	.sectionNote {
+		margin-top: @spacing-sm;
+		font-size: @font-xs;
+		color: @color-text-subtle;
+		line-height: @line-height-normal;
+		padding: 0 @spacing-md;
+	}
+}
+
+.rows {
+	background: @color-bg-elevated;
+	border-radius: @radius-lg;
+	overflow: hidden;
+}
+
+.row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: @spacing-md @spacing-lg;
+	border-bottom: 1px solid @color-bg-card;
+	cursor: default;
+	outline: none;
+	transition: background @duration-fast @easing-out;
+
+	&:last-child {
+		border-bottom: none;
+	}
+
+	&.action {
+		cursor: pointer;
+	}
+
+	&:global(.spottable-focused) {
+		background: @color-bg-card-focused;
+		outline: @focus-ring-width solid @color-brand-white;
+		outline-offset: -4px;
+	}
+
+	.rowLabel {
+		font-size: @font-sm;
+		color: @color-text;
+		font-weight: @font-weight-medium;
+	}
+
+	.rowValue {
+		font-size: @font-sm;
+		color: @color-text;
+		font-weight: @font-weight-medium;
+	}
+}
+
+.mutedValue {
+	color: @color-text-muted;
+	font-weight: @font-weight-normal;
+}
+
+.footer {
+	margin-top: @spacing-xl;
+	display: flex;
+	justify-content: flex-start;
+}

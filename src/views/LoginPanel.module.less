@@ -1,0 +1,209 @@
+@import '../styles/variables.less';
+
+.panel {
+	width: 100vw;
+	height: 100vh;
+	background: @gradient-hero;
+	overflow: hidden;
+}
+
+.content {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: @spacing-xl;
+}
+
+.brand {
+	text-align: center;
+	margin-bottom: @spacing-xl;
+
+	.logo {
+		font-size: @font-display;
+		font-weight: @font-weight-black;
+		color: @color-text;
+		letter-spacing: -0.04em;
+		text-shadow: @shadow-glow-primary;
+	}
+
+	.accent {
+		color: @color-brand-primary;
+	}
+
+	.tagline {
+		margin-top: @spacing-xs;
+		font-size: @font-md;
+		color: @color-text-muted;
+	}
+}
+
+.card {
+	background: @color-bg-elevated;
+	border-radius: @radius-xl;
+	padding: @spacing-xxl;
+	min-width: 720px;
+	max-width: 900px;
+	box-shadow: @shadow-card-hi;
+}
+
+.title {
+	font-size: @font-xl;
+	font-weight: @font-weight-bold;
+	color: @color-text;
+	margin-bottom: @spacing-xl;
+	text-align: center;
+}
+
+.steps {
+	display: flex;
+	flex-direction: column;
+	gap: @spacing-lg;
+	margin-bottom: @spacing-xl;
+}
+
+.step {
+	display: flex;
+	gap: @spacing-md;
+	align-items: flex-start;
+
+	.stepNumber {
+		flex-shrink: 0;
+		width: 48px;
+		height: 48px;
+		border-radius: 50%;
+		background: @color-brand-primary;
+		color: @color-brand-white;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: @font-md;
+		font-weight: @font-weight-bold;
+	}
+
+	.stepText {
+		font-size: @font-md;
+		color: @color-text;
+		line-height: @line-height-normal;
+	}
+}
+
+.url {
+	font-family: @font-family-mono;
+	font-size: @font-lg;
+	font-weight: @font-weight-bold;
+	color: @color-brand-primary;
+	margin-top: @spacing-xs;
+	letter-spacing: 0.04em;
+}
+
+.code {
+	display: flex;
+	gap: @spacing-xs;
+	margin-top: @spacing-md;
+}
+
+.codeChar {
+	width: 72px;
+	height: 96px;
+	background: @color-bg-card;
+	border: 2px solid @color-brand-primary;
+	border-radius: @radius-md;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: @font-family-mono;
+	font-size: @font-xxl;
+	font-weight: @font-weight-black;
+	color: @color-text;
+	letter-spacing: 0;
+}
+
+.codeLoading {
+	color: @color-text-muted;
+	font-size: @font-sm;
+	padding: @spacing-md 0;
+}
+
+.statusRow, .successRow, .errorRow {
+	display: flex;
+	align-items: center;
+	gap: @spacing-md;
+	justify-content: center;
+	padding: @spacing-md;
+	border-radius: @radius-md;
+	font-size: @font-sm;
+	margin-bottom: @spacing-lg;
+}
+
+.statusRow {
+	background: @color-bg-card;
+	color: @color-text-muted;
+}
+
+.successRow {
+	background: rgba(0, 200, 83, 0.15);
+	color: @color-success;
+	font-weight: @font-weight-bold;
+}
+
+.errorRow {
+	background: rgba(255, 61, 0, 0.15);
+	color: @color-error;
+	flex-wrap: wrap;
+}
+
+.spinner {
+	width: 20px;
+	height: 20px;
+	border: 2px solid rgba(255,255,255,0.2);
+	border-top-color: @color-text;
+	border-radius: 50%;
+	animation: spin 900ms linear infinite;
+}
+
+.checkmark {
+	width: 32px;
+	height: 32px;
+	background: @color-success;
+	color: white;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: @font-weight-bold;
+	font-size: @font-md;
+}
+
+.divider {
+	display: flex;
+	align-items: center;
+	gap: @spacing-md;
+	margin: @spacing-lg 0;
+	color: @color-text-subtle;
+	font-size: @font-sm;
+
+	&::before, &::after {
+		content: '';
+		flex: 1;
+		height: 1px;
+		background: @color-text-subtle;
+		opacity: 0.3;
+	}
+}
+
+.guestAction {
+	text-align: center;
+
+	.guestNote {
+		margin-top: @spacing-sm;
+		font-size: @font-xs;
+		color: @color-text-subtle;
+	}
+}
+
+@keyframes spin {
+	to { transform: rotate(360deg); }
+}

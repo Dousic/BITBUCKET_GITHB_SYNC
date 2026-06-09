@@ -1,0 +1,74 @@
+# =============================================================================
+# .arespackageignore — Files and directories excluded from the IPK build
+# =============================================================================
+#
+# This file fixes one of the core audit findings: the shipped 1.0.1 IPK
+# included empty src/ scaffolding, webos-meta/, .gitignore, and accumulated
+# stale bundles in assets/. That makes the package look unclean to LG
+# reviewers and bloats the download.
+#
+# ares-package reads this file from the project root before creating the IPK.
+# Paths are relative to the directory being packaged (usually dist/).
+
+# Dev files
+.git
+.gitignore
+.github
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Source (built output goes in dist/, never ship src/)
+src
+docs
+
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+yarn.lock
+package-lock.json
+
+# Enact build artifacts
+.enact-build-cache
+.enactrc.local
+coverage
+build-sw.js
+
+# Test
+__tests__
+__mocks__
+*.test.js
+*.test.jsx
+*.spec.js
+*.spec.jsx
+
+# Editor
+*.swp
+*.swo
+*~
+
+# Environment config (production values injected via env vars at build time)
+.env
+.env.local
+.env.development
+.env.example
+
+# webOS build intermediates
+*.ipk.tmp
+*.ipk.bak
+
+# Misc
+README.md
+CHANGELOG.md
+LICENSE
+*.log
+
+# Dev-only files inside resources/ (placeholder generators, docs for asset specs).
+# Enact's build copies the resources/ tree into dist/ unchanged, so these would
+# otherwise ride along into the IPK. The placeholder generators are tiny but
+# look unprofessional in an LG cert review.
+resources/icons/README.md
+resources/icons/generate_placeholders.py
+**/*.py

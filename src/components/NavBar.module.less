@@ -1,0 +1,128 @@
+@import '../styles/variables.less';
+
+.navBar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	width: @nav-width-collapsed;
+	// Solid background — `backdrop-filter: blur(16px)` was removed because it
+	// costs 20-40 FPS on webOS 4/5 hardware during nav transitions. The brand
+	// behind it is pure black, so solid + alpha is visually identical.
+	background: rgba(10, 10, 10, 0.96);
+	display: flex;
+	flex-direction: column;
+	z-index: @z-nav;
+	transition: width @duration-normal @easing-out;
+	padding: @spacing-lg 0;
+
+	// Expand on container focus — state-driven from the NavBar component.
+	// Replaces the CSS `:has()` rule which is webOS 24+ only.
+	&.expanded {
+		width: @nav-width;
+	}
+
+	.brand {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0 @spacing-md;
+		margin-bottom: @spacing-xl;
+
+		.logo {
+			font-size: @font-xl;
+			font-weight: @font-weight-black;
+			color: @color-text;
+			letter-spacing: -0.04em;
+		}
+
+		.accent {
+			color: @color-brand-primary;
+		}
+	}
+
+	.items {
+		display: flex;
+		flex-direction: column;
+		gap: @spacing-xs;
+		padding: 0 @spacing-sm;
+	}
+}
+
+.item {
+	position: relative;
+	display: flex;
+	align-items: center;
+	padding: @spacing-md @spacing-sm;
+	border-radius: @radius-md;
+	color: @color-text-muted;
+	cursor: pointer;
+	outline: none;
+	transition: all @duration-normal @easing-out;
+	gap: @spacing-md;
+
+	.icon {
+		width: 32px;
+		height: 32px;
+		flex-shrink: 0;
+		// Use mask for icon shapes so color inherits from currentColor
+		background: currentColor;
+	}
+
+	// CSS icon definitions (no SVG file needed; keeps the bundle tiny)
+	.icon-home {
+		mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z'/></svg>") center/contain no-repeat;
+		-webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z'/></svg>") center/contain no-repeat;
+	}
+	.icon-browse {
+		mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z'/></svg>") center/contain no-repeat;
+		-webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z'/></svg>") center/contain no-repeat;
+	}
+	.icon-live {
+		mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='12' cy='12' r='4' fill='black'/><path fill='black' d='M12 4a8 8 0 1 0 8 8 8 8 0 0 0-8-8zm0 14a6 6 0 1 1 6-6 6 6 0 0 1-6 6z'/></svg>") center/contain no-repeat;
+		-webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='12' cy='12' r='4' fill='black'/><path fill='black' d='M12 4a8 8 0 1 0 8 8 8 8 0 0 0-8-8zm0 14a6 6 0 1 1 6-6 6 6 0 0 1-6 6z'/></svg>") center/contain no-repeat;
+	}
+	.icon-search {
+		mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 5 1.49-1.49zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z'/></svg>") center/contain no-repeat;
+		-webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 5 1.49-1.49zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z'/></svg>") center/contain no-repeat;
+	}
+	.icon-profile {
+		mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>") center/contain no-repeat;
+		-webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='black' d='M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>") center/contain no-repeat;
+	}
+
+	.label {
+		font-size: @font-sm;
+		font-weight: @font-weight-medium;
+		white-space: nowrap;
+		opacity: 0;
+		transform: translateX(-8px);
+		transition: all @duration-normal @easing-out;
+	}
+
+	.activeIndicator {
+		position: absolute;
+		left: 0;
+		top: 20%;
+		bottom: 20%;
+		width: 4px;
+		background: @color-brand-primary;
+		border-radius: 0 @radius-sm @radius-sm 0;
+	}
+
+	&.active {
+		color: @color-text;
+	}
+
+	&:global(.spottable-focused) {
+		background: @color-bg-card-focused;
+		color: @color-text;
+		outline: @focus-ring-width solid @focus-ring-color;
+	}
+}
+
+// Show labels when nav bar is expanded — state-driven (see top of file).
+.navBar.expanded .item .label {
+	opacity: 1;
+	transform: translateX(0);
+}

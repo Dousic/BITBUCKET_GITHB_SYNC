@@ -1,0 +1,115 @@
+@import '../styles/variables.less';
+
+.player {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	background: #000;
+}
+
+.video {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	display: block;
+}
+
+.audioBackdrop {
+	position: absolute;
+	top: 0; right: 0; bottom: 0; left: 0;
+	background:
+		radial-gradient(circle at 50% 42%, rgba(255, 0, 255, 0.28), transparent 32%),
+		linear-gradient(135deg, #090909 0%, #171017 45%, #000 100%);
+	background-position: center;
+	background-size: cover;
+	pointer-events: none;
+}
+
+.audioBackdropScrim {
+	position: absolute;
+	top: 0; right: 0; bottom: 0; left: 0;
+	background:
+		linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.85)),
+		rgba(0, 0, 0, 0.4);
+	// `backdrop-filter: blur(24px)` removed — too expensive on webOS 4/5
+	// GPUs. The darker linear-gradient above compensates visually. Audit H3.
+}
+
+// Make native caption rendering match brand
+.video::cue {
+	background: rgba(0, 0, 0, 0.78);
+	color: @color-brand-white;
+	font-size: 1.2em;
+	font-weight: @font-weight-medium;
+	text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+}
+
+.loadingOverlay {
+	position: absolute;
+	top: 0; right: 0; bottom: 0; left: 0;
+	background: rgba(0, 0, 0, 0.6);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	pointer-events: none;
+	z-index: 2;
+}
+
+.spinner {
+	width: 80px;
+	height: 80px;
+	border: 4px solid rgba(255, 255, 255, 0.2);
+	border-top-color: @color-brand-primary;
+	border-radius: 50%;
+	animation: spin 900ms linear infinite;
+}
+
+.errorOverlay {
+	position: absolute;
+	top: 0; right: 0; bottom: 0; left: 0;
+	background: @color-bg-scrim;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: @spacing-xl;
+	text-align: center;
+	z-index: 3;
+}
+
+.errorTitle {
+	font-size: @font-xl;
+	font-weight: @font-weight-bold;
+	color: @color-text;
+	margin-bottom: @spacing-md;
+}
+
+.errorMessage {
+	font-size: @font-md;
+	color: @color-text-muted;
+	margin-bottom: @spacing-lg;
+	max-width: 640px;
+}
+
+.retryButton {
+	background: @color-brand-primary;
+	color: @color-brand-white;
+	border: none;
+	padding: @spacing-sm @spacing-xl;
+	border-radius: @radius-md;
+	font-size: @font-sm;
+	font-weight: @font-weight-bold;
+	cursor: pointer;
+	outline: @focus-ring-width solid transparent;
+	transition: all @duration-normal @easing-out;
+
+	&:focus {
+		outline-color: @color-brand-white;
+		transform: scale(1.05);
+		box-shadow: @focus-ring-glow;
+	}
+}
+
+@keyframes spin {
+	to { transform: rotate(360deg); }
+}

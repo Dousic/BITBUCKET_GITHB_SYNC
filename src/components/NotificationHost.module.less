@@ -1,0 +1,33 @@
+@import '../styles/variables.less';
+
+.host {
+	position: fixed;
+	bottom: @spacing-lg;
+	right: @spacing-lg;
+	display: flex;
+	flex-direction: column;
+	gap: @spacing-sm;
+	z-index: @z-notification;
+	max-width: 480px;
+}
+
+.toast {
+	background: @color-bg-elevated;
+	color: @color-text;
+	padding: @spacing-md @spacing-lg;
+	border-radius: @radius-md;
+	font-size: @font-sm;
+	font-weight: @font-weight-medium;
+	box-shadow: @shadow-card-hi;
+	border-left: 4px solid @color-info;
+	animation: slideIn @duration-normal @easing-out;
+
+	&.success { border-left-color: @color-success; }
+	&.warning { border-left-color: @color-warning; }
+	&.error   { border-left-color: @color-error; }
+}
+
+@keyframes slideIn {
+	from { opacity: 0; transform: translateX(32px); }
+	to   { opacity: 1; transform: translateX(0); }
+}
