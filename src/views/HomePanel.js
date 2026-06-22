@@ -20,31 +20,15 @@ import SpotlightContainerDecorator from '@enact/spotlight/SpotlightContainerDeco
 import {useContentStore} from '../state/contentStore';
 import {useAppStore} from '../state/appStore';
 import {useViewPersistence} from '../hooks/useViewPersistence';
-import HeroCarousel from '../components/HeroCarousel';
 import ContentRail from '../components/ContentRail';
 import telemetry from '../platform/telemetry';
 import Strings from '../i18n/strings';
 import css from './HomePanel.module.less';
 
-// Normalize a /content/featured (or home hero) payload to an array,
+// Normalize a /content/featured (or home featured) payload to an array,
 // whatever the backend wraps it in.
 const asItems = (d) =>
 	Array.isArray(d) ? d : (d?.items || d?.featured || d?.hero || d?.results || d?.data || []);
-
-// TEMP diagnostic: describe a payload's shape (keys + array lengths) so the
-// TV can self-report what /content/featured and /content/home actually
-// return. Shown only when the carousel is empty. Remove once the carousel +
-// content mapping are confirmed against the real API.
-const summarize = (label, d) => {
-	if (d == null) return `${label}=null`;
-	if (Array.isArray(d)) return `${label}=array(${d.length})`;
-	if (typeof d === 'object') {
-		const parts = Object.keys(d).map((k) =>
-			(Array.isArray(d[k]) ? `${k}[${d[k].length}]` : k));
-		return `${label}={${parts.join(', ')}}`;
-	}
-	return `${label}=${typeof d}`;
-};
 
 const HomePanelBase = (props) => {
 	const home = useContentStore((s) => s.home);
@@ -63,15 +47,6 @@ const HomePanelBase = (props) => {
 		telemetry.trackScreenView('home');
 	}, [loadHome, loadFeatured]);
 
-	const handlePlay = (item) => {
-		pushView('player', {contentId: item.id});
-		telemetry.trackEvent('content_play', {content_id: item.id, source: 'home_hero'});
-	};
-
-	const handleMoreInfo = (item) => {
-		pushView('content-detail', {contentId: item.id});
-	};
-
 	const handleSelectCard = (item, railName) => {
 		if (item.is_live || item.isLive) {
 			pushView('player', {contentId: item.id});
@@ -85,10 +60,11 @@ const HomePanelBase = (props) => {
 	};
 
 	const data = home?.data;
-	// Hero carousel items: prefer the dedicated /content/featured payload,
-	// fall back to a hero/featured list embedded in the home payload.
-	const featuredItems = asItems(featured?.data);
-	const heroItems = featuredItems.length > 0 ? featuredItems : (data?.hero || data?.featured || []);
+	// Featured items: prefer the dedicated /content/featured payload, fall
+	// back to a featured/hero list embedded in the home payload.
+	const featuredFromEndpoint = asItems(featured?.data);
+	const featuredItems = featuredFromEndpoint.length > 0 ?
+		featuredFromEndpoint : (data?.featured || data?.hero || []);
 
 	return (
 		<Panel {...props} className={css.panel}>
@@ -104,22 +80,16 @@ const HomePanelBase = (props) => {
 					</div>
 				)}
 
-				{heroItems.length > 0 && (
-					<HeroCarousel
-						items={heroItems}
-						onPlay={handlePlay}
-						onMoreInfo={handleMoreInfo}
-					/>
-				)}
-
-				{/* TEMP: surface API shape when the carousel is empty (remove later) */}
-				{!isLoading && heroItems.length === 0 && data && (
-					<div className={css.dataDiag}>
-						{summarize('featured', featured?.data)} · {summarize('home', data)}
-					</div>
-				)}
-
 				<div className={css.rails}>
+					{featuredItems.length > 0 && (
+						<ContentRail
+							title={Strings.home.featured()}
+							items={featuredItems}
+							cardSize="wide"
+							onSelectItem={(item) => handleSelectCard(item, 'featured')}
+						/>
+					)}
+
 					{data?.continue_watching?.length > 0 && (
 						<ContentRail
 							title={Strings.home.continueWatching()}

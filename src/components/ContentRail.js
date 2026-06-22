@@ -57,7 +57,7 @@ const ContentRail = SpotlightContainerDecorator(
 								<ContentCard
 									id={item.id}
 									title={item.title}
-									thumbnailUrl={item.thumbnail_url || item.thumbnailUrl}
+									thumbnailUrl={item.thumbnail_url || item.thumbnailUrl || item.cover_url || item.image_url || item.image || item.poster_url || item.backdrop_url}
 									subtitle={item.subtitle}
 									creator={item.creator?.handle || item.creator}
 									isLive={item.is_live || item.isLive}

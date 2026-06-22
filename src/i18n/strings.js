@@ -51,6 +51,7 @@ export default {
 
 	// Home
 	home: {
+		featured:          () => $L('Featured'),
 		continueWatching:  () => $L('Continue watching'),
 		liveNow:           () => $L('Live now'),
 		douStitch:         () => $L('Dou-Stitch Live broadcasts'),
