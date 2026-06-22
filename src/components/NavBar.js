@@ -66,14 +66,18 @@ NavIcon.propTypes = {icon: PropTypes.string.isRequired};
 // `onKeyDown` Enter handler, which could double-fire on certain remote
 // firmwares — see audit H4. Spottable also manages `tabIndex` internally;
 // the previous `tabIndex={-1}` (audit H5) fought that bookkeeping.
-const NavItemBase = ({id, label, icon, active, onSelect}) => {
+const NavItemBase = ({id, label, icon, active, onSelect, className, ...rest}) => {
 	const handleSelect = useCallback(() => onSelect?.(id), [id, onSelect]);
 
 	const labelText = typeof label === 'function' ? label() : label;
 
+	// Spread Spotlight's injected props (tabIndex, focus/key handlers, the
+	// `spottable` class) onto the root and MERGE className — without this the
+	// nav items aren't focusable by the remote's 5-way at all (pointer-only).
 	return (
 		<div
-			className={classNames(css.item, {[css.active]: active})}
+			{...rest}
+			className={classNames(css.item, className, {[css.active]: active})}
 			onClick={handleSelect}
 			role="button"
 			aria-label={labelText}
@@ -91,6 +95,7 @@ NavItemBase.propTypes = {
 	id: PropTypes.string.isRequired,
 	label: PropTypes.oneOfType([PropTypes.string, PropTypes.func]).isRequired,
 	active: PropTypes.bool,
+	className: PropTypes.string,
 	onSelect: PropTypes.func
 };
 

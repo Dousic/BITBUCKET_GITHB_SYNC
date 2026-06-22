@@ -40,6 +40,7 @@ const ContentCardBase = ({
 	type,
 	size = 'medium',
 	onSelect,
+	className,
 	...rest
 }) => {
 	// Marketplace media-type label (Audio / Video / …) shown as a corner pill,
@@ -56,11 +57,11 @@ const ContentCardBase = ({
 
 	return (
 		<div
-			className={classNames(css.card, css[size], {[css.live]: isLive})}
+			{...rest}
+			className={classNames(css.card, css[size], className, {[css.live]: isLive})}
 			onClick={handleSelect}
 			role="button"
 			aria-label={`${title}${creator ? ' by ' + creator : ''}`}
-			{...rest}
 		>
 			<div className={css.thumbnail}>
 				{thumbnailUrl ? (
@@ -113,6 +114,7 @@ const ContentCardBase = ({
 ContentCardBase.propTypes = {
 	id: PropTypes.string.isRequired,
 	title: PropTypes.string.isRequired,
+	className: PropTypes.string,
 	creator: PropTypes.string,
 	duration: PropTypes.number,
 	isLive: PropTypes.bool,
