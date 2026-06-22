@@ -9,7 +9,8 @@
 import {useState, useCallback, useEffect, useRef} from 'react';
 import {Panel} from '@enact/moonstone/Panels';
 import Scroller from '@enact/moonstone/Scroller';
-import SpotlightContainerDecorator from '@enact/spotlight/SpotlightContainerDecorator';
+import SpotlightContainerDecorator, {spotlightDefaultClass} from '@enact/spotlight/SpotlightContainerDecorator';
+import Spotlight from '@enact/spotlight';
 import Spottable from '@enact/spotlight/Spottable';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -62,8 +63,13 @@ const Keyboard = SpotlightContainerDecorator(
 		<div className={css.keyboard}>
 			{KEY_ROWS.map((row, i) => (
 				<div key={i} className={css.row}>
-					{row.map((ch) => (
-						<Key key={ch} value={ch} onPress={onPress} />
+					{row.map((ch, j) => (
+						<Key
+							key={ch}
+							value={ch}
+							onPress={onPress}
+							className={i === 0 && j === 0 ? spotlightDefaultClass : null}
+						/>
 					))}
 				</div>
 			))}
@@ -125,6 +131,13 @@ const SearchPanelBase = (props) => {
 
 	useEffect(() => {
 		telemetry.trackScreenView('search');
+		// Plant focus inside the on-screen keyboard so the remote's arrow keys
+		// work immediately. Without this, focus stays on the nav item that
+		// launched Search and there's no clean spatial path into the grid.
+		const raf = window.requestAnimationFrame(() => {
+			try { Spotlight.focus('search-keyboard'); } catch (_) { /* noop */ }
+		});
+		return () => window.cancelAnimationFrame(raf);
 	}, []);
 
 	// Debounced search
@@ -192,6 +205,7 @@ const SearchPanelBase = (props) => {
 
 				<div className={css.body}>
 					<Keyboard
+						spotlightId="search-keyboard"
 						onPress={handleKeyPress}
 						onSpace={handleSpace}
 						onDelete={handleDelete}

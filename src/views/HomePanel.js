@@ -31,6 +31,21 @@ import css from './HomePanel.module.less';
 const asItems = (d) =>
 	Array.isArray(d) ? d : (d?.items || d?.featured || d?.hero || d?.results || d?.data || []);
 
+// TEMP diagnostic: describe a payload's shape (keys + array lengths) so the
+// TV can self-report what /content/featured and /content/home actually
+// return. Shown only when the carousel is empty. Remove once the carousel +
+// content mapping are confirmed against the real API.
+const summarize = (label, d) => {
+	if (d == null) return `${label}=null`;
+	if (Array.isArray(d)) return `${label}=array(${d.length})`;
+	if (typeof d === 'object') {
+		const parts = Object.keys(d).map((k) =>
+			(Array.isArray(d[k]) ? `${k}[${d[k].length}]` : k));
+		return `${label}={${parts.join(', ')}}`;
+	}
+	return `${label}=${typeof d}`;
+};
+
 const HomePanelBase = (props) => {
 	const home = useContentStore((s) => s.home);
 	const featured = useContentStore((s) => s.featured);
@@ -95,6 +110,13 @@ const HomePanelBase = (props) => {
 						onPlay={handlePlay}
 						onMoreInfo={handleMoreInfo}
 					/>
+				)}
+
+				{/* TEMP: surface API shape when the carousel is empty (remove later) */}
+				{!isLoading && heroItems.length === 0 && data && (
+					<div className={css.dataDiag}>
+						{summarize('featured', featured?.data)} · {summarize('home', data)}
+					</div>
 				)}
 
 				<div className={css.rails}>

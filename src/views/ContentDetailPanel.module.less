@@ -42,6 +42,9 @@
 	position: relative;
 	z-index: 1;
 	padding: @spacing-xxl @safe-area-side @spacing-xl;
+	// Clear the persistent left nav (now shown on this view) so the title and
+	// action buttons aren't hidden behind the rail.
+	padding-left: @nav-width-collapsed;
 	max-width: 900px;
 	min-height: 75vh;
 	display: flex;

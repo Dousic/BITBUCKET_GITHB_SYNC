@@ -76,12 +76,11 @@ const VIEW_COMPONENTS = {
 	settings: SettingsPanel
 };
 
-// Views where the persistent NavBar should be visible. Modal-like views
-// (player, content-detail, creator, login, settings) are full-screen and
-// don't show the nav. The list matches the root views in appStore's
-// ROOT_VIEWS but is named separately because "shows the nav" is a UI
-// concern, not a navigation-stack concern.
-const NAV_VIEWS = new Set(['home', 'browse', 'live', 'search', 'profile']);
+// Views where the persistent NavBar should be visible. The content-detail
+// page keeps the nav (matching dousic.media, where the item page still shows
+// the top nav). Only the full-screen player and the modal login hide it.
+// "Shows the nav" is a UI concern, named separately from the nav stack.
+const NAV_VIEWS = new Set(['home', 'browse', 'live', 'search', 'profile', 'content-detail']);
 
 const AppBase = () => {
 	// Platform state
@@ -147,6 +146,10 @@ const AppBase = () => {
 		const raf = window.requestAnimationFrame(() => {
 			try {
 				Spotlight.setPointerMode(false);
+				// Child panels' own mount-focus runs first (React fires child
+				// effects before parent). If a panel already planted focus
+				// (e.g. Search → keyboard), don't yank it back to the root.
+				if (Spotlight.getCurrent()) return;
 				if (!Spotlight.focus()) {
 					// Nothing resolved yet (container still settling) — retry once.
 					window.requestAnimationFrame(() => {
