@@ -118,21 +118,30 @@
 
 	&:global(.spottable-focused),
 	&.focused {
-		transform: scale(1.08);
+		transform: scale(1.1);
 		z-index: 10;
 
 		.thumbnail {
-			box-shadow: @focus-ring-glow;
-			outline: @focus-ring-width solid @focus-ring-color;
-			outline-offset: 0;
+			// Bold, on-brand focus treatment. The previous thin white ring
+			// got lost against varied artwork and its outer glow was clipped
+			// by the rail's horizontal scroller, so on hardware you couldn't
+			// tell which card was highlighted. A thick magenta outline (drawn
+			// outside the box) plus an INSET white ring (never clipped) makes
+			// the focused card unmistakable on any thumbnail.
+			outline: 6px solid @color-brand-primary;
+			outline-offset: 2px;
+			box-shadow:
+				inset 0 0 0 3px @color-brand-white,
+				0 12px 48px rgba(255, 0, 255, 0.55);
 		}
 
 		.gradient {
-			opacity: 0.3;
+			opacity: 0.15;
 		}
 
 		.title {
 			color: @color-brand-white;
+			font-weight: @font-weight-bold;
 		}
 	}
 }
