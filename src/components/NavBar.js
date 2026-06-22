@@ -35,6 +35,32 @@ const NAV_ITEMS = [
 	{id: 'profile', label: () => Strings.nav.profile(), icon: 'profile'}
 ];
 
+// Inline SVG icons (filled via `fill: currentColor`). Replaces the previous
+// CSS `-webkit-mask` approach, which intermittently dropped the icon on
+// webOS Chromium when the nav's width transition triggered a compositor
+// repaint on focus — leaving items blank and selection ambiguous.
+const ICON_PATHS = {
+	home: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
+	browse: 'M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z',
+	search: 'M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 5 1.49-1.49zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z',
+	profile: 'M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'
+};
+
+const NavIcon = ({icon}) => (
+	<svg className={css.icon} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+		{icon === 'live' ? (
+			<>
+				<circle cx="12" cy="12" r="4" />
+				<path d="M12 4a8 8 0 1 0 8 8 8 8 0 0 0-8-8zm0 14a6 6 0 1 1 6-6 6 6 0 0 1-6 6z" />
+			</>
+		) : (
+			<path d={ICON_PATHS[icon]} />
+		)}
+	</svg>
+);
+
+NavIcon.propTypes = {icon: PropTypes.string.isRequired};
+
 // Spottable owns activation: it synthesizes a click on Enter for the host
 // element, so we only need `onClick`. The previous code also had an
 // `onKeyDown` Enter handler, which could double-fire on certain remote
@@ -53,7 +79,7 @@ const NavItemBase = ({id, label, icon, active, onSelect}) => {
 			aria-label={labelText}
 			aria-current={active ? 'page' : null}
 		>
-			<div className={classNames(css.icon, css[`icon-${icon}`])} />
+			<NavIcon icon={icon} />
 			<div className={css.label}>{labelText}</div>
 			{active && <div className={css.activeIndicator} />}
 		</div>

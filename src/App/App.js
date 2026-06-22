@@ -132,6 +132,32 @@ const AppBase = () => {
 		return () => telemetry.shutdown();
 	}, [initAuth, setReady]);
 
+	// Plant initial 5-way focus whenever the top-of-stack view changes.
+	//
+	// webOS launches the app in Magic-Remote POINTER mode with nothing
+	// focused. In that state the directional (arrow) keys have no "current"
+	// element to move from, so they appear dead until the user wakes the
+	// pointer — exactly the "arrows don't work, cursor does" report. We force
+	// 5-way mode and focus the new view's default element after it paints, so
+	// the arrow keys work immediately. Moving the Magic Remote re-enables
+	// pointer mode on its own, so this is non-destructive.
+	const topViewName = viewStack[viewStack.length - 1]?.name;
+	useEffect(() => {
+		if (!isReady) return () => {};
+		const raf = window.requestAnimationFrame(() => {
+			try {
+				Spotlight.setPointerMode(false);
+				if (!Spotlight.focus()) {
+					// Nothing resolved yet (container still settling) — retry once.
+					window.requestAnimationFrame(() => {
+						try { Spotlight.focus(); } catch (_) { /* noop */ }
+					});
+				}
+			} catch (_) { /* Spotlight not ready — harmless */ }
+		});
+		return () => window.cancelAnimationFrame(raf);
+	}, [isReady, isAuthenticated, topViewName]);
+
 	// Push device info / locale / captions into app store
 	useEffect(() => {
 		if (deviceInfo) setDeviceInfo(deviceInfo);
