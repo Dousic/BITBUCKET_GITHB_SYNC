@@ -41,6 +41,7 @@ const ContentCardBase = ({
 	size = 'medium',
 	onSelect,
 	className,
+	onKeyDown,
 	...rest
 }) => {
 	// Marketplace media-type label (Audio / Video / …) shown as a corner pill,
@@ -51,13 +52,24 @@ const ContentCardBase = ({
 		onSelect?.({id, title});
 	}, [id, title, onSelect]);
 
-	// Spottable synthesizes a click on Enter for the host element, so a
-	// manual onKeyDown Enter handler is redundant and on some remote
-	// firmwares fires the action twice. Removed per audit H4.
+	// Activate on OK/Enter explicitly. Spottable's built-in select->click
+	// emulation does not fire for our base-Spottable usage (verified: the
+	// card highlights under 5-way but OK/Enter never opened it), so we handle
+	// the select keys here and still forward to Spotlight's own onKeyDown so
+	// 5-way navigation keeps working.
+	const handleKeyDown = useCallback((e) => {
+		if (e.keyCode === 13 || e.keyCode === 16777221) {
+			e.preventDefault();
+			handleSelect();
+			return; // handled here; don't let Spottable also emulate a click
+		}
+		onKeyDown?.(e);
+	}, [handleSelect, onKeyDown]);
 
 	return (
 		<div
 			{...rest}
+			onKeyDown={handleKeyDown}
 			className={classNames(css.card, css[size], className, {[css.live]: isLive})}
 			onClick={handleSelect}
 			role="button"
@@ -119,6 +131,7 @@ ContentCardBase.propTypes = {
 	duration: PropTypes.number,
 	isLive: PropTypes.bool,
 	onSelect: PropTypes.func,
+	onKeyDown: PropTypes.func,
 	size: PropTypes.oneOf(['small', 'medium', 'large', 'wide']),
 	subtitle: PropTypes.string,
 	thumbnailUrl: PropTypes.string,

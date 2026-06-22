@@ -30,15 +30,26 @@ const KEY_ROWS = [
 	['z', 'x', 'c', 'v', 'b', 'n', 'm']
 ];
 
-const KeyBase = ({value, label, width = 1, className, onPress, ...rest}) => {
+const KeyBase = ({value, label, width = 1, className, onPress, onKeyDown, ...rest}) => {
 	const handlePress = useCallback(() => onPress?.(value), [value, onPress]);
 
-	// Spottable synthesizes click on Enter — no manual handler needed (H4).
+	// Activate on OK/Enter under 5-way (Spottable's click emulation doesn't
+	// fire for our base-Spottable usage); forward other keys to Spotlight.
+	const handleKeyDown = useCallback((e) => {
+		if (e.keyCode === 13 || e.keyCode === 16777221) {
+			e.preventDefault();
+			handlePress();
+			return;
+		}
+		onKeyDown?.(e);
+	}, [handlePress, onKeyDown]);
+
 	return (
 		<div
 			{...rest}
 			className={classNames(css.key, className, width > 1 && css[`key-w${width}`])}
 			onClick={handlePress}
+			onKeyDown={handleKeyDown}
 			role="button"
 			aria-label={label || value}
 		>
@@ -52,6 +63,7 @@ KeyBase.propTypes = {
 	className: PropTypes.string,
 	label: PropTypes.string,
 	onPress: PropTypes.func,
+	onKeyDown: PropTypes.func,
 	width: PropTypes.number
 };
 

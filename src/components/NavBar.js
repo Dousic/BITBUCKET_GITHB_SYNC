@@ -66,8 +66,20 @@ NavIcon.propTypes = {icon: PropTypes.string.isRequired};
 // `onKeyDown` Enter handler, which could double-fire on certain remote
 // firmwares — see audit H4. Spottable also manages `tabIndex` internally;
 // the previous `tabIndex={-1}` (audit H5) fought that bookkeeping.
-const NavItemBase = ({id, label, icon, active, onSelect, className, ...rest}) => {
+const NavItemBase = ({id, label, icon, active, onSelect, className, onKeyDown, ...rest}) => {
 	const handleSelect = useCallback(() => onSelect?.(id), [id, onSelect]);
+
+	// Activate on OK/Enter under 5-way (Spottable's built-in click emulation
+	// doesn't fire for our base-Spottable usage); still forward to Spotlight's
+	// onKeyDown so arrow navigation keeps working.
+	const handleKeyDown = useCallback((e) => {
+		if (e.keyCode === 13 || e.keyCode === 16777221) {
+			e.preventDefault();
+			handleSelect();
+			return;
+		}
+		onKeyDown?.(e);
+	}, [handleSelect, onKeyDown]);
 
 	const labelText = typeof label === 'function' ? label() : label;
 
@@ -79,6 +91,7 @@ const NavItemBase = ({id, label, icon, active, onSelect, className, ...rest}) =>
 			{...rest}
 			className={classNames(css.item, className, {[css.active]: active})}
 			onClick={handleSelect}
+			onKeyDown={handleKeyDown}
 			role="button"
 			aria-label={labelText}
 			aria-current={active ? 'page' : null}
@@ -96,7 +109,8 @@ NavItemBase.propTypes = {
 	label: PropTypes.oneOfType([PropTypes.string, PropTypes.func]).isRequired,
 	active: PropTypes.bool,
 	className: PropTypes.string,
-	onSelect: PropTypes.func
+	onSelect: PropTypes.func,
+	onKeyDown: PropTypes.func
 };
 
 const NavItem = Spottable(NavItemBase);
