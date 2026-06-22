@@ -18,12 +18,15 @@
 	// padding so the focus scale-up AND its ring/glow are never clipped by
 	// the scroller's overflow. (Previously they only budgeted thumbnail +
 	// padding, so card titles were cut off and the focus ring was clipped.)
-	&.size-small  .scroller { height: 360px; }   // 135 thumb + title + focus
-	&.size-medium .scroller { height: 440px; }   // 202 thumb + title + focus
-	&.size-large  .scroller { height: 710px; }   // 480 thumb + title + focus
-	&.size-wide   .scroller { height: 500px; }   // 257 thumb + title + focus
+	// Title now overlays the artwork, so a card is just its thumbnail. Heights
+	// budget thumbnail + a generous focus allowance (scale + ring + glow) so
+	// the focused card is never clipped by the scroller's overflow.
+	&.size-small  .scroller { height: 270px; }   // 135 thumb + focus
+	&.size-medium .scroller { height: 330px; }   // 202 thumb + focus
+	&.size-large  .scroller { height: 620px; }   // 480 thumb + focus
+	&.size-wide   .scroller { height: 390px; }   // 257 thumb + focus
 	// Default — used if no size class matches.
-	.scroller { height: 440px; }
+	.scroller { height: 330px; }
 
 	.track {
 		display: flex;

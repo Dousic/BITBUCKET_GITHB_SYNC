@@ -52,7 +52,7 @@ button { font-family: inherit; }
 // =========================================================================
 //
 // We suppress browser :hover effects in pointer-less remote mode and rely
-// entirely on Spotlight's .spottable-focused class.
+// entirely on native :focus, which Spotlight applies to the focused element.
 
 @media (hover: none) {
 	*:hover {
@@ -62,8 +62,10 @@ button { font-family: inherit; }
 	}
 }
 
-// Smooth scale transition for focused elements
-.spottable-focused {
+// Smooth scale transition for focused elements. Enact applies focus via
+// native DOM :focus on the .spottable element (there is no
+// "spottable-focused" class), so all focus styling keys off `.spottable:focus`.
+.spottable:focus {
 	transition: transform @duration-normal @easing-out,
 		box-shadow @duration-normal @easing-out;
 }

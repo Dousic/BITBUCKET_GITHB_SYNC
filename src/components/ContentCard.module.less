@@ -47,21 +47,30 @@
 		pointer-events: none;
 	}
 
-	.meta {
-		padding: @spacing-sm @spacing-xs 0;
+	// Title sits on the artwork (absolute), hidden until the card is focused.
+	.titleOverlay {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		padding: @spacing-md;
+		background: linear-gradient(transparent, rgba(0, 0, 0, 0.55) 35%, rgba(0, 0, 0, 0.92));
+		opacity: 0;
+		transition: opacity @duration-normal @easing-out;
 	}
 
 	.title {
 		font-size: @font-md;
 		font-weight: @font-weight-bold;
-		color: @color-text;
+		color: @color-brand-white;
 		line-height: @line-height-tight;
 		.clamp-2();
 	}
 
 	.subtitle {
 		font-size: @font-sm;
-		color: @color-text-muted;
+		color: @color-text;
+		opacity: 0.85;
 		margin-top: 4px;
 		.truncate();
 	}
@@ -129,18 +138,19 @@
 
 	// -------- Focus state --------
 
-	&:global(.spottable-focused),
+	// Enact applies focus via native :focus on the .spottable card element
+	// (there is no "spottable-focused" class — the previous selector never
+	// matched, which is why focus was invisible). `.focused` is kept for
+	// tests/forced states.
+	&:focus,
 	&.focused {
 		transform: scale(1.1);
 		z-index: 10;
 
 		.thumbnail {
-			// Bold, on-brand focus treatment. The previous thin white ring
-			// got lost against varied artwork and its outer glow was clipped
-			// by the rail's horizontal scroller, so on hardware you couldn't
-			// tell which card was highlighted. A thick magenta outline (drawn
-			// outside the box) plus an INSET white ring (never clipped) makes
-			// the focused card unmistakable on any thumbnail.
+			// Bold, on-brand focus ring: a thick magenta outline (drawn
+			// outside the box) plus an INSET white ring (never clipped) make
+			// the focused card unmistakable on any artwork.
 			outline: 6px solid @color-brand-primary;
 			outline-offset: 2px;
 			box-shadow:
@@ -148,13 +158,9 @@
 				0 12px 48px rgba(255, 0, 255, 0.55);
 		}
 
-		.gradient {
-			opacity: 0.15;
-		}
-
-		.title {
-			color: @color-brand-white;
-			font-weight: @font-weight-bold;
+		// Brighten the title in only on the focused card.
+		.titleOverlay {
+			opacity: 1;
 		}
 	}
 }

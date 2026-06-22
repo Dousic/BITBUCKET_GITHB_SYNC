@@ -93,13 +93,18 @@ const ContentCardBase = ({
 				)}
 
 				<div className={css.gradient} />
-			</div>
 
-			<div className={css.meta}>
-				<div className={css.title}>{title}</div>
-				{(subtitle || creator) && (
-					<div className={css.subtitle}>{subtitle || creator}</div>
-				)}
+				{/*
+				  * Title overlay on the artwork. Hidden by default and
+				  * brightened only when the card is focused — both a clean
+				  * marketplace look and an unmistakable focus cue.
+				  */}
+				<div className={css.titleOverlay}>
+					<div className={css.title}>{title}</div>
+					{(subtitle || creator) && (
+						<div className={css.subtitle}>{subtitle || creator}</div>
+					)}
+				</div>
 			</div>
 		</div>
 	);
@@ -119,8 +124,8 @@ ContentCardBase.propTypes = {
 	viewerCount: PropTypes.number
 };
 
-// Wrap with Spottable — gives it .spottable + .spottable-focused classes
-// and forwards `spotlightId` as `data-spotlight-id` on the host element.
+// Wrap with Spottable — adds the .spottable class, native focus handling
+// (style via :focus), and forwards `spotlightId` as `data-spotlight-id`.
 const ContentCardSpottable = Spottable(ContentCardBase);
 
 // ContentCard — stable spotlightId derived from `id` when none is provided
