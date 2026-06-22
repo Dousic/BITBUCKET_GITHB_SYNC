@@ -95,12 +95,19 @@
 @viewport-width: 1920px;
 @viewport-height: 1080px;
 
-@nav-width: 240px;
-@nav-width-collapsed: 96px;
-
 @safe-area-top:    60px; // LG guideline: 5% from top edge
 @safe-area-bottom: 60px;
 @safe-area-side:   96px;
+
+// Nav rail. The visible icon/label column PLUS a left safe-area inset so the
+// fixed rail clears TV overscan (a flush left:0 rail was hidden behind the
+// bezel on real hardware, and violated LG's safe-area guideline). NavBar
+// applies `padding-left: @safe-area-side`; panels reserve the full width as
+// their left gutter, so these two stay in lockstep via this single source.
+@nav-rail-collapsed:  96px;   // visible icon column
+@nav-rail-expanded:   240px;  // visible column with labels
+@nav-width-collapsed: @nav-rail-collapsed + @safe-area-side; // 192 — reserved gutter
+@nav-width:           @nav-rail-expanded + @safe-area-side;  // 336
 
 // -------------------- Radius --------------------
 

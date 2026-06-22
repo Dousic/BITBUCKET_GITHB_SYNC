@@ -15,7 +15,7 @@ import PropTypes from 'prop-types';
 
 import {useAppStore} from '../state/appStore';
 import {useViewPersistence} from '../hooks/useViewPersistence';
-import {content as contentApi, user as userApi} from '../services/api';
+import {content as contentApi, user as userApi, resolveAssetUrl} from '../services/api';
 import ContentRail from '../components/ContentRail';
 import telemetry from '../platform/telemetry';
 import Strings from '../i18n/strings';
@@ -97,7 +97,7 @@ const ContentDetailPanelBase = ({contentId}) => {
 		<Panel className={css.panel}>
 			<div className={css.backdrop}>
 				{meta.backdrop_url && (
-					<img src={meta.backdrop_url} alt="" className={css.backdropImage} />
+					<img src={resolveAssetUrl(meta.backdrop_url)} alt="" className={css.backdropImage} />
 				)}
 				<div className={css.gradient} />
 			</div>
@@ -110,7 +110,7 @@ const ContentDetailPanelBase = ({contentId}) => {
 			>
 				<div className={css.content}>
 					{meta.logo_url ? (
-						<img src={meta.logo_url} alt={meta.title} className={css.logo} />
+						<img src={resolveAssetUrl(meta.logo_url)} alt={meta.title} className={css.logo} />
 					) : (
 						<h1 className={css.title}>{meta.title}</h1>
 					)}

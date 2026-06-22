@@ -12,6 +12,7 @@ import Spottable from '@enact/spotlight/Spottable';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+import {resolveAssetUrl} from '../services/api';
 import css from './ContentCard.module.less';
 
 const formatViewerCount = (n) => {
@@ -58,7 +59,7 @@ const ContentCardBase = ({
 		>
 			<div className={css.thumbnail}>
 				{thumbnailUrl ? (
-					<img src={thumbnailUrl} alt="" className={css.image} />
+					<img src={resolveAssetUrl(thumbnailUrl)} alt="" className={css.image} />
 				) : (
 					<div className={css.placeholder}>
 						<span>{title?.[0]?.toUpperCase() || 'D'}</span>

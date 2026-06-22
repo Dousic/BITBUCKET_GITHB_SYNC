@@ -40,7 +40,7 @@ import Spotlight from '@enact/spotlight';
 import {getWebOSMajorVersion} from '../platform/luna';
 import {useScreensaverControl} from '../hooks/usePlatform';
 import telemetry from '../platform/telemetry';
-import {user as userApi} from '../services/api';
+import {user as userApi, resolveAssetUrl} from '../services/api';
 import {friendlyPlaybackMessage} from '../utils/playerErrors';
 import Strings from '../i18n/strings';
 import css from './VideoPlayer.module.less';
@@ -377,7 +377,7 @@ const VideoPlayer = forwardRef(({
 			{isAudioOnly && (
 				<div
 					className={css.audioBackdrop}
-					style={posterUrl ? {backgroundImage: `url("${posterUrl}")`} : null}
+					style={posterUrl ? {backgroundImage: `url("${resolveAssetUrl(posterUrl)}")`} : null}
 					aria-hidden="true"
 				>
 					<div className={css.audioBackdropScrim} />

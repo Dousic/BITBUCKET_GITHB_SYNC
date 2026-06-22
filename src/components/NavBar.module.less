@@ -15,6 +15,11 @@
 	z-index: @z-nav;
 	transition: width @duration-normal @easing-out;
 	padding: @spacing-lg 0;
+	// Inset the rail's contents past the TV's left overscan / safe area. The
+	// background still bleeds to the screen edge (looks intentional), but the
+	// brand + icons live inside the safe zone so they're never clipped by the
+	// bezel. Width vars already include this inset (border-box).
+	padding-left: @safe-area-side;
 
 	// Expand on container focus — state-driven from the NavBar component.
 	// Replaces the CSS `:has()` rule which is webOS 24+ only.

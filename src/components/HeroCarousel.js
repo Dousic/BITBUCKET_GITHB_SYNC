@@ -15,6 +15,7 @@ import Button from '@enact/moonstone/Button';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+import {resolveAssetUrl} from '../services/api';
 import Strings from '../i18n/strings';
 import css from './HeroCarousel.module.less';
 
@@ -63,7 +64,7 @@ const HeroCarouselBase = ({items = [], onPlay, onMoreInfo}) => {
 			<div className={css.backdrop}>
 				{current.backdrop_url && (
 					<img
-						src={current.backdrop_url}
+						src={resolveAssetUrl(current.backdrop_url)}
 						alt=""
 						className={css.backdropImage}
 						key={current.id}
@@ -74,7 +75,7 @@ const HeroCarouselBase = ({items = [], onPlay, onMoreInfo}) => {
 
 			<div className={css.content}>
 				{current.logo_url ? (
-					<img src={current.logo_url} alt={current.title} className={css.logo} />
+					<img src={resolveAssetUrl(current.logo_url)} alt={current.title} className={css.logo} />
 				) : (
 					<h1 className={css.title}>{current.title}</h1>
 				)}

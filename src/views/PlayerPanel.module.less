@@ -96,7 +96,11 @@
 	height: 100%;
 	display: flex;
 	flex-direction: column;
-	justify-content: space-between;
+	// The transport row (.bottomBar) is now the only child here — the title +
+	// back affordance moved to the always-on PersistentTopBar. With the old
+	// `space-between`, a lone child sat at the TOP, which is why the playback
+	// controls appeared at the top of the screen. Anchor them to the bottom.
+	justify-content: flex-end;
 	background: linear-gradient(
 		180deg,
 		rgba(0,0,0,0.8) 0%,

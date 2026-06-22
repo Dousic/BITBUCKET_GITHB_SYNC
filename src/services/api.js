@@ -31,6 +31,26 @@ const MAX_RETRIES = 2;
 // host/status failed so the TV can self-report without DevTools attached).
 export const API_BASE_URL = BASE_URL;
 
+/**
+ * Resolve a possibly-relative asset URL (poster, thumbnail, backdrop, logo)
+ * to an absolute one.
+ *
+ * The webOS app is served from file://, so a backend that returns a
+ * root-relative path like "/storage/posters/x.jpg" would otherwise resolve
+ * to file:///storage/... and silently fail to load. Prefix those with the
+ * API origin. Already-absolute (http/https/data/blob) and protocol-relative
+ * URLs are passed through untouched.
+ *
+ * @param {string} url
+ * @returns {string}
+ */
+export const resolveAssetUrl = (url) => {
+	if (!url || typeof url !== 'string') return url;
+	if (/^(https?:|data:|blob:)/i.test(url)) return url;
+	if (url.startsWith('//')) return `https:${url}`;
+	return `${BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
 const STORAGE_KEYS = {
 	refreshToken: 'dousic_refresh_token',
 	deviceId: 'dousic_device_id'
