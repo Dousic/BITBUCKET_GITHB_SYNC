@@ -15,7 +15,7 @@ import PropTypes from 'prop-types';
 
 import {useAuthStore} from '../state/authStore';
 import {useAppStore} from '../state/appStore';
-import {auth as authApi} from '../services/api';
+import {auth as authApi, API_BASE_URL} from '../services/api';
 import {classifyPairPoll, isConnectivityError} from '../utils/pairing';
 import telemetry from '../platform/telemetry';
 import Strings from '../i18n/strings';
@@ -26,6 +26,16 @@ const POLL_INTERVAL_MS = 3000;
 // hint. ~3 × 3s ≈ 9s of no network before we say anything — short enough to
 // be honest, long enough to ride out a single dropped poll.
 const OFFLINE_AFTER = 3;
+
+// Compact "host · status" string for on-screen field diagnostics, so the TV
+// reports WHY an API call failed without DevTools (e.g. wrong host, CORS,
+// 404, or a dead backend all look identical to the user otherwise).
+const describeApiError = (e) => {
+	let host = API_BASE_URL;
+	try { host = new URL(API_BASE_URL).host; } catch (_) { /* keep raw */ }
+	const detail = e?.status ? `HTTP ${e.status}` : (e?.code || e?.message || 'failed');
+	return `${host} · ${detail}`;
+};
 
 const formatTime = (s) => {
 	const m = Math.floor(s / 60);
@@ -45,6 +55,7 @@ const LoginPanelBase = () => {
 	//   expired  — the code's own countdown hit zero
 	const [status, setStatus] = useState('idle');
 	const [error, setError] = useState(null);
+	const [diag, setDiag] = useState(null); // "host · status" shown on failure
 	const pollTimer = useRef();
 	const tickTimer = useRef();
 	const settled = useRef(false);   // true once we reach a terminal state
@@ -114,6 +125,7 @@ const LoginPanelBase = () => {
 	const requestCode = useCallback(async () => {
 		setStatus('waiting');
 		setError(null);
+		setDiag(null);
 		try {
 			const data = await authApi.requestPairingCode();
 			setPairingCode(data.code);
@@ -121,6 +133,7 @@ const LoginPanelBase = () => {
 			startPolling(data.code);
 		} catch (e) {
 			setError(Strings.login.errorTitle());
+			setDiag(describeApiError(e));
 			setStatus('error');
 			telemetry.captureException(e, {phase: 'request-pairing-code'});
 		}
@@ -159,6 +172,9 @@ const LoginPanelBase = () => {
 			notify(Strings.login.guestNote(), {type: 'info'});
 			switchRoot('home');
 		} catch (e) {
+			// Guest hits the same API host as pairing — surface the same
+			// diagnostic so a backend/host outage is visible either way.
+			setDiag(describeApiError(e));
 			notify(Strings.errorBoundary.title(), {type: 'error'});
 		}
 	};
@@ -235,6 +251,10 @@ const LoginPanelBase = () => {
 								{Strings.login.newCode()}
 							</Button>
 						</div>
+					)}
+
+					{diag && (status === 'error' || status === 'failed') && (
+						<div className={css.diag}>{diag}</div>
 					)}
 
 					<div className={css.divider}>

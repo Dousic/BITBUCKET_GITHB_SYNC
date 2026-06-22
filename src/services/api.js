@@ -27,6 +27,10 @@ const API_PATH = '/api/webos/v1';
 const TIMEOUT_MS = 30000;
 const MAX_RETRIES = 2;
 
+// Exposed for on-screen diagnostics (e.g. the login panel surfaces which
+// host/status failed so the TV can self-report without DevTools attached).
+export const API_BASE_URL = BASE_URL;
+
 const STORAGE_KEYS = {
 	refreshToken: 'dousic_refresh_token',
 	deviceId: 'dousic_device_id'

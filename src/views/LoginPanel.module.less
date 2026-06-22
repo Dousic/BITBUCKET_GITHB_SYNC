@@ -13,13 +13,19 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	justify-content: center;
-	padding: @spacing-xl;
+	// Pin to the top inside the safe area rather than centering. Centering a
+	// card taller than the viewport pushed the "dousic" wordmark above y=0,
+	// where TV overscan clipped it. Top-anchoring + safe-area insets keeps
+	// the brand fully on-screen; overflow-y lets a tall card scroll instead
+	// of clipping on smaller panels. (Real-hardware overscan fix.)
+	justify-content: flex-start;
+	overflow-y: auto;
+	padding: @safe-area-top @spacing-xl @safe-area-bottom;
 }
 
 .brand {
 	text-align: center;
-	margin-bottom: @spacing-xl;
+	margin-bottom: @spacing-lg;
 
 	.logo {
 		font-size: @font-display;
@@ -153,6 +159,18 @@
 	background: rgba(255, 61, 0, 0.15);
 	color: @color-error;
 	flex-wrap: wrap;
+}
+
+// Compact failure diagnostic (host · status) shown under the error row so
+// the TV self-reports why an API call failed — invaluable for field
+// debugging on hardware without DevTools attached.
+.diag {
+	margin: -@spacing-sm 0 @spacing-lg;
+	text-align: center;
+	font-family: @font-family-mono;
+	font-size: @font-xs;
+	color: @color-text-subtle;
+	letter-spacing: 0.02em;
 }
 
 .spinner {
