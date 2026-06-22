@@ -9,6 +9,10 @@ build/
 *.ipk
 *.ipk.tmp
 
+# Local verification artifacts (headless screenshot pass; NOT LG submission
+# assets — cert requires real-TV captures)
+screenshots/
+
 # Enact cache
 .enact-build-cache
 coverage
