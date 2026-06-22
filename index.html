@@ -9,33 +9,33 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
 
     <!--
-      Content Security Policy
-
+      Content Security Policy (production)
+      ------------------------------------
       Enact apps run under file:// on webOS, so 'self' resolves to the app's
-      own origin. connect-src allows:
-        - REST API (http/https) on both localhost (dev) and api.dousic.media (prod)
-        - WebSocket (ws/wss) for Reverb on localhost:8080 (dev) and api.dousic.media (prod)
-        - CDN for HLS streams (https://*.dousic-cdn.com placeholder, plus the
-          public HLS demo hosts used in MVP seed content)
+      own origin.
 
-      Note on script-src 'unsafe-eval':
-        Enact's dev server and the @enact/cli test runner require it. For a
-        hardened production IPK you can drop 'unsafe-eval' from script-src —
-        React 18 prod builds do not evaluate strings at runtime. To tighten:
-          1. Fork this CSP into a prod-only variant via a build-time template,
-             or find-replace during `enact pack -p` (see scripts/ for pattern)
-          2. Remove 'unsafe-eval' from script-src in that variant
-          3. Run full QA against prod IPK — a regression here would surface
-             as a broken Enact internal
-        This is tracked as M-9 in the audit handoff.
+      connect-src uses subdomain wildcards on dousic.media for the REST API,
+      pairing flow, and Reverb WebSocket. Wildcards are CSP-spec-compliant
+      and match webOS's Chromium engine — they let us point at any current
+      or future subdomain (api, staging, ws, auth, pair, ...) without
+      revisiting CSP on every backend route addition.
+
+      'unsafe-eval' is removed — React 18 production builds do not eval
+      strings at runtime. Enact's dev server needs it, but `enact pack -p`
+      does not. Re-add it ONLY if a runtime regression surfaces and you
+      have time to QA a separate dev template.
+
+      `*.dousic-cdn.com` is a placeholder for the production HLS CDN host.
+      Confirm with the streaming team before LG submission; if the CDN
+      lives at a different domain (e.g. CloudFront, BunnyCDN), update
+      this directive or playback will be CSP-blocked.
     -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self';
-               script-src 'self' 'unsafe-inline' 'unsafe-eval';
+               script-src 'self' 'unsafe-inline';
                connect-src 'self'
-                 http://localhost:8000 http://localhost:8080
-                 ws://localhost:8080
-                 https://api.dousic.media https://staging.dousic.media https://dousic.media
-                 wss://ws.dousic.media;
+                 https://*.dousic.media
+                 wss://*.dousic.media
+                 https://*.dousic-cdn.com;
                img-src 'self' https: data: blob:;
                style-src 'self' 'unsafe-inline';
                font-src 'self' data:;

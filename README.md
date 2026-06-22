@@ -78,8 +78,8 @@ See [`docs/BUILD_GUIDE.md`](docs/BUILD_GUIDE.md) for the comprehensive build, si
 | `src/hooks/` | React hooks for platform features (useBackKey, useCaptions, useNetwork, useVisibility, useRelaunch) |
 | `src/i18n/` | English, Korean, Spanish (Latin American) bundles |
 | `src/styles/` | Design token variables, global styles, font override |
-| `resources/icons/` | Launcher icons and splash assets per LG spec |
-| `appinfo.json` | webOS manifest (root of repo; what ares-package reads) |
+| `resources/icons/` | Art-asset specs and store-listing artwork |
+| `webos-meta/appinfo.json` | webOS manifest + launcher icons; Enact emits the copy into `dist/` that `ares-package` reads |
 | `.enactrc` | Enact build configuration |
 | `.arespackageignore` | Files excluded from the IPK (audit defensive measure) |
 | `.env.example` | Template for environment variables |

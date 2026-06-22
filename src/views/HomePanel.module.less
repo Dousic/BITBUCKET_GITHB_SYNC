@@ -11,6 +11,15 @@
 	margin-left: @nav-width-collapsed;
 	width: calc(100vw - @nav-width-collapsed);
 	height: 100vh;
+	// Top inset so the hero and first rail don't sit in the overscan
+	// danger zone on TVs that crop the outer ~5% of the panel. Tradeoff
+	// vs the original full-bleed design: a 60px black band above the
+	// hero. Worth it — the previous build had hero artwork and the
+	// pulldown carousel title clipped on real hardware (issue #1 from
+	// the LG submission shakedown). The horizontal padding is intentionally
+	// LEFT OFF so rails can full-bleed to the right edge, matching the
+	// Netflix/Disney+ TV idiom.
+	padding-top: @safe-area-top;
 }
 
 .loading {

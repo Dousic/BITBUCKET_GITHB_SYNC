@@ -27,6 +27,15 @@ export const friendlyPlaybackMessage = (err) => {
 		(err.message || err.details || err.code || err.name || '');
 	const lower = String(raw).toLowerCase();
 
+	// HLS rendition/manifest load timeouts are a "can't reach the stream"
+	// (not-found) condition, not a transient network blip. They carry the
+	// `timeout` substring, so they MUST be classified before the generic
+	// network family below — otherwise the `timeout` token there swallows
+	// them and the viewer gets the wrong message.
+	if (/levelloadtimeout|manifestloadtimeout/.test(lower)) {
+		return Strings.playerErrors.notFound();
+	}
+
 	// Network family — check first because these often wrap other error types
 	if (/network|fetch|timeout|abort|offline|econnreset|connect/.test(lower)) {
 		return Strings.playerErrors.network();

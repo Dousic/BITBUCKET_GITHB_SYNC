@@ -5,6 +5,20 @@
 	width: 100%;
 	height: 100%;
 	background: #000;
+	// Establish an explicit stacking context.
+	//
+	// On webOS the <video> element renders via a hardware overlay plane
+	// that ignores DOM z-index unless its ancestor establishes a stacking
+	// context. Without this, sibling overlays (transport controls in
+	// PlayerPanel) paint UNDER the video surface and the user sees pixels
+	// of the play/pause button bleeding through the picture. (Issue #3
+	// from the LG submission shakedown.)
+	//
+	// `isolation: isolate` is the most explicit way to create a stacking
+	// context without side effects. `transform: translateZ(0)` would also
+	// work but adds a compositor layer we don't need. Both are widely
+	// supported on Chromium 68+ (webOS 5.0+ baseline).
+	isolation: isolate;
 }
 
 .video {
@@ -12,6 +26,11 @@
 	height: 100%;
 	object-fit: contain;
 	display: block;
+	// Pin the video to z:0 within the stacking context so every overlay
+	// (loading spinner z:2, error overlay z:3, transport controls in
+	// PlayerPanel z:10) renders above it deterministically.
+	position: relative;
+	z-index: 0;
 }
 
 .audioBackdrop {

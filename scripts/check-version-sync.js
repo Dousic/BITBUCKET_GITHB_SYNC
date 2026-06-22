@@ -7,11 +7,13 @@
  * version string. This script is the gate that prevents that drift.
  *
  * It compares the version declared in three places that must agree:
- *   1. package.json         → drives `$npm_package_version` and the
- *                             IPK filename produced by `ares-package`
- *   2. appinfo.json         → the manifest LG cert reads from the IPK
- *   3. src/version.js       → the runtime constant used by Settings UI
- *                             and telemetry tagging
+ *   1. package.json             → drives `$npm_package_version` and the
+ *                                 IPK filename produced by `ares-package`
+ *   2. webos-meta/appinfo.json  → the manifest LG cert reads from the IPK
+ *                                 (canonical location per B-NEW-4; Enact's
+ *                                 WebOSMetaPlugin emits the dist/ copy)
+ *   3. src/version.js           → the runtime constant used by Settings UI
+ *                                 and telemetry tagging
  *
  * Runs as `npm run preversion-check`, wired into `package` and `deploy`.
  * Fails loudly (exit code 1) if any of the three disagree.
@@ -53,14 +55,16 @@ function extractRuntimeVersion() {
 	return m[1];
 }
 
+const APPINFO_PATH = path.join('webos-meta', 'appinfo.json');
+
 const pkg = readJson('package.json');
-const appinfo = readJson('appinfo.json');
+const appinfo = readJson(APPINFO_PATH);
 const runtime = extractRuntimeVersion();
 
 const versions = {
-	'package.json':  pkg.version,
-	'appinfo.json':  appinfo.version,
-	'src/version.js': runtime
+	'package.json':          pkg.version,
+	'webos-meta/appinfo.json': appinfo.version,
+	'src/version.js':        runtime
 };
 
 const unique = new Set(Object.values(versions));
@@ -72,7 +76,7 @@ if (unique.size === 1) {
 
 console.error('[version-sync] FAILED — version drift detected:');
 for (const [k, v] of Object.entries(versions)) {
-	console.error(`  ${k.padEnd(18)} → ${v}`);
+	console.error(`  ${k.padEnd(24)} → ${v}`);
 }
 console.error('');
 console.error('Fix: pick the target version and update all three to match.');

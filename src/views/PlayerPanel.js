@@ -69,32 +69,50 @@ IconButtonBase.propTypes = {
 };
 const IconButton = Spottable(IconButtonBase);
 
+// PersistentTopBar — always-visible back button + content title.
+//
+// First-time viewers don't realize the LG remote's hardware Back button
+// exits the player. The previous implementation tucked the back affordance
+// inside the auto-hide overlay, which meant after 3 seconds of inactivity
+// there was no visible way out and users felt stuck. This component lives
+// OUTSIDE the auto-hide overlay (rendered as a sibling in the player
+// container) and stays visible for the entire playback session. Issue #2.
+const PersistentTopBar = SpotlightContainerDecorator(
+	{enterTo: 'default-element'},
+	({title, creator, isLive, onBack}) => (
+		<div className={css.persistentTopBar}>
+			<IconButton
+				icon="back"
+				label={Strings.back()}
+				spotlightId="player-back"
+				onPress={onBack}
+			/>
+			<div className={css.titleBlock}>
+				<div className={css.contentTitle}>{title}</div>
+				{creator && <div className={css.creator}>{creator}</div>}
+			</div>
+			{isLive && (
+				<div className={css.liveIndicator}>
+					<span className={css.liveDot} />
+					{Strings.player.liveLabel()}
+				</div>
+			)}
+		</div>
+	)
+);
+
 const PlayerControls = SpotlightContainerDecorator(
 	{enterTo: 'default-element'},
-	({isPlaying, position, duration, isLive, title, creator, onPlayPause, onSeek, onBack}) => {
+	({isPlaying, position, duration, isLive, onPlayPause, onSeek}) => {
 		const progress = duration > 0 ? (position / duration) * 100 : 0;
 
 		return (
 			<div className={css.controls}>
-				<div className={css.topBar}>
-					<IconButton
-						icon="back"
-						label={Strings.back()}
-						spotlightId="player-back"
-						onPress={onBack}
-					/>
-					<div className={css.titleBlock}>
-						<div className={css.contentTitle}>{title}</div>
-						{creator && <div className={css.creator}>{creator}</div>}
-					</div>
-					{isLive && (
-						<div className={css.liveIndicator}>
-							<span className={css.liveDot} />
-							{Strings.player.liveLabel()}
-						</div>
-					)}
-				</div>
-
+				{/*
+				  * Top bar removed from here — back + title now live in
+				  * PersistentTopBar (always visible). This block is only
+				  * the auto-hiding transport row.
+				  */}
 				<div className={css.bottomBar}>
 					<div className={css.transportRow}>
 						<IconButton
@@ -227,15 +245,24 @@ const PlayerPanelBase = ({contentId, isLive: isLiveProp}) => {
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [contentId]);
 
-	// Auto-hide controls
+	// Auto-hide transport controls.
+	//
+	// Previously also moved focus to 'play-pause' on hide, which silently
+	// stranded focus inside a pointer-events:none container (the now-hidden
+	// overlay). When the user pressed Back on the remote, focus was on an
+	// unreachable element and the keypress occasionally failed to surface
+	// through Spotlight to our global back handler.
+	//
+	// On hide, we move focus to the always-visible back button instead.
+	// That keeps focus inside a Spottable that the user can actually see,
+	// and means the remote's Enter key has a meaningful default action
+	// (exit player) when controls are hidden. Issue #2.
 	const resetHideTimer = useCallback(() => {
 		setShowControls(true);
 		clearTimeout(hideTimer.current);
 		hideTimer.current = setTimeout(() => {
 			setShowControls(false);
-			// Move focus back to a safe target when controls hide. Bare
-			// spotlightId (Spotlight resolves it internally) — see audit H7.
-			Spotlight.focus('play-pause');
+			Spotlight.focus('player-back');
 		}, CONTROLS_HIDE_MS);
 	}, []);
 
@@ -354,17 +381,25 @@ const PlayerPanelBase = ({contentId, isLive: isLiveProp}) => {
 					onError={handlePlayerError}
 				/>
 
+				{/*
+				  * Always-visible back + title. Lives outside .controlsOverlay
+				  * so it doesn't fade with the transport row. Issue #2.
+				  */}
+				<PersistentTopBar
+					title={meta?.title || ''}
+					creator={meta?.creator?.display_name || meta?.creator?.handle}
+					isLive={isLive}
+					onBack={handleBack}
+				/>
+
 				<div className={classNames(css.controlsOverlay, {[css.visible]: showControls})}>
 					<PlayerControls
 						isPlaying={isPlaying}
 						position={position}
 						duration={duration}
 						isLive={isLive}
-						title={meta?.title || ''}
-						creator={meta?.creator?.display_name || meta?.creator?.handle}
 						onPlayPause={handlePlayPause}
 						onSeek={handleSeek}
-						onBack={handleBack}
 					/>
 				</div>
 			</div>

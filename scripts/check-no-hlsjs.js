@@ -1,81 +1,113 @@
 #!/usr/bin/env node
 /* eslint-env node */
 /**
- * Dousic — postbuild assertion
+ * Dousic — postbuild: guarantee hls.js does not ship in the prod IPK
  *
- * Fails the build if hls.js symbols appear in the production dist/ bundle
- * when REACT_APP_NATIVE_HLS_ONLY=true. The ~400KB hls.js library is
- * dynamically imported behind a flag in VideoPlayer.js; this script
- * catches regressions where a refactor accidentally hoists the import
- * back to static.
+ * On every supported webOS target (5.0+) the TV plays HLS natively, so
+ * `REACT_APP_NATIVE_HLS_ONLY=true` and the ~500 KB hls.js library must
+ * not ride along in the IPK.
  *
- * Usage:
- *   node scripts/check-no-hlsjs.js         # run after enact pack -p
+ * Two things this script gets right that the original did not:
  *
- * Add to package.json "scripts":
- *   "pack-p": "enact pack -p && node scripts/check-no-hlsjs.js"
+ *  1. It can SEE the flag. The build-time value lives in `.env.production`
+ *     (consumed by webpack), not in this Node process's env. The old
+ *     script read `process.env.REACT_APP_NATIVE_HLS_ONLY`, found nothing,
+ *     and silently skipped — a permanent false pass. We now fall back to
+ *     parsing `.env.production`.
+ *
+ *  2. It can SEE hls.js. The old signatures ('hlsDefaultConfig',
+ *     'EVENT_MANIFEST_PARSED', ...) are pre-minification identifiers that
+ *     terser mangles away — they never match a real prod bundle. We match
+ *     on HLS *playlist tag literals* ('#EXT-X-', 'PATHWAY-ID', ...) which
+ *     are spec strings hls.js must preserve and which never appear in app
+ *     code.
+ *
+ * Behaviour when NATIVE_HLS_ONLY=true:
+ *   - VideoPlayer.js keeps a dynamic `import('hls.js')` for non-webOS
+ *     targets. webpack always emits that as a separate chunk, but with the
+ *     flag inlined true the call site is dead-code-eliminated from main.js,
+ *     leaving the chunk ORPHANED (never `__webpack_require__.e`'d).
+ *   - An orphan chunk is safe but wasteful, so we delete it and report.
+ *   - If an hls.js signature appears in main.js itself, or a chunk is
+ *     still referenced by main.js, that's a real regression (a static
+ *     import crept back in) → hard fail.
  */
 
 const fs = require('fs');
 const path = require('path');
 
-const DIST = path.join(__dirname, '..', 'dist');
-const NATIVE_HLS_ONLY = process.env.REACT_APP_NATIVE_HLS_ONLY === 'true';
+const ROOT = path.resolve(__dirname, '..');
+const DIST = path.join(ROOT, 'dist');
+const MAIN_JS = path.join(DIST, 'main.js');
 
-if (!NATIVE_HLS_ONLY) {
-	console.log('[check-no-hlsjs] NATIVE_HLS_ONLY is not true — skipping check.');
+// --- Resolve the build flag: process.env first, then .env.production -------
+function resolveNativeHlsOnly() {
+	if (typeof process.env.REACT_APP_NATIVE_HLS_ONLY === 'string') {
+		return process.env.REACT_APP_NATIVE_HLS_ONLY === 'true';
+	}
+	const envFile = path.join(ROOT, '.env.production');
+	if (fs.existsSync(envFile)) {
+		const m = fs.readFileSync(envFile, 'utf8')
+			.match(/^\s*REACT_APP_NATIVE_HLS_ONLY\s*=\s*(\S+)/m);
+		if (m) return m[1].replace(/['"]/g, '') === 'true';
+	}
+	return false;
+}
+
+if (!resolveNativeHlsOnly()) {
+	console.log('[check-no-hlsjs] NATIVE_HLS_ONLY is not true — hls.js is allowed. Skipping.');
 	process.exit(0);
 }
 
 if (!fs.existsSync(DIST)) {
-	console.error('[check-no-hlsjs] dist/ does not exist — run enact pack first.');
+	console.error('[check-no-hlsjs] dist/ does not exist — run the pack step first.');
 	process.exit(1);
 }
 
-// Signatures unique to hls.js runtime. These should NEVER appear in a
-// prod webOS bundle when NATIVE_HLS_ONLY=true. The dynamic import()
-// chunk file itself is still emitted by webpack under some configs —
-// we walk recursively and fail on any hit.
-const SIGNATURES = [
-	'hlsDefaultConfig',        // hls.js internal config object
-	'MSE_MP4_H264',            // hls.js quality tier constant
-	'EVENT_MANIFEST_PARSED',   // hls.js event name
-	'fragLoadEmergencyAborted' // hls.js-only error code
-];
+// HLS playlist tag literals — unique to hls.js, survive minification.
+const SIGNATURES = ['#EXT-X-', 'PATHWAY-ID', 'STABLE-RENDITION-ID', 'X-ASSET-LIST'];
+const looksLikeHls = (src) => SIGNATURES.some((s) => src.includes(s));
 
-const walk = (dir, out = []) => {
+const walkJs = (dir, out = []) => {
 	for (const name of fs.readdirSync(dir)) {
 		const full = path.join(dir, name);
-		const stat = fs.statSync(full);
-		if (stat.isDirectory()) walk(full, out);
+		if (fs.statSync(full).isDirectory()) walkJs(full, out);
 		else if (/\.(js|mjs)$/.test(name)) out.push(full);
 	}
 	return out;
 };
 
-const jsFiles = walk(DIST);
-const hits = [];
-for (const f of jsFiles) {
-	const src = fs.readFileSync(f, 'utf8');
-	for (const sig of SIGNATURES) {
-		if (src.includes(sig)) {
-			hits.push({file: path.relative(DIST, f), signature: sig});
-			break;
-		}
-	}
-}
+const mainSrc = fs.existsSync(MAIN_JS) ? fs.readFileSync(MAIN_JS, 'utf8') : '';
 
-if (hits.length > 0) {
-	console.error('[check-no-hlsjs] FAIL — hls.js appears to be in the prod bundle:');
-	for (const h of hits) {
-		console.error(`  ${h.file} contains "${h.signature}"`);
-	}
-	console.error('');
-	console.error('  VideoPlayer.js should import hls.js only via dynamic import() behind');
-	console.error('  the REACT_APP_NATIVE_HLS_ONLY flag. Check that no new static import');
-	console.error('  has been introduced and that the flag is true in the production .env.');
+// 1) hls.js bytes in the entry bundle itself = a static import regression.
+if (mainSrc && looksLikeHls(mainSrc)) {
+	console.error('[check-no-hlsjs] FAIL — hls.js is bundled into main.js.');
+	console.error('  A static `import Hls from "hls.js"` likely replaced the dynamic import.');
+	console.error('  VideoPlayer.js must import hls.js only via `await import("hls.js")`.');
 	process.exit(1);
 }
 
-console.log(`[check-no-hlsjs] OK — ${jsFiles.length} files scanned, no hls.js symbols present.`);
+// 2) Inspect chunk files: delete orphans, fail on referenced hls.js chunks.
+let removed = 0;
+for (const file of walkJs(DIST)) {
+	if (file === MAIN_JS) continue;
+	const src = fs.readFileSync(file, 'utf8');
+	if (!looksLikeHls(src)) continue;
+
+	const chunkId = (path.basename(file).match(/(\d+)/) || [])[1];
+	const referenced = chunkId &&
+		(mainSrc.includes(`.e(${chunkId})`) || mainSrc.includes(`"${chunkId}"`));
+
+	if (referenced) {
+		console.error(`[check-no-hlsjs] FAIL — ${path.relative(DIST, file)} contains hls.js and is still loaded by main.js.`);
+		console.error('  The dynamic import was not dead-code-eliminated. Confirm NATIVE_HLS_ONLY=true is inlined.');
+		process.exit(1);
+	}
+
+	fs.rmSync(file);
+	removed++;
+	console.log(`[check-no-hlsjs] removed orphan hls.js chunk: ${path.relative(DIST, file)}`);
+}
+
+console.log(`[check-no-hlsjs] OK — no hls.js in shipped bundle (${removed} orphan chunk(s) pruned).`);
 process.exit(0);

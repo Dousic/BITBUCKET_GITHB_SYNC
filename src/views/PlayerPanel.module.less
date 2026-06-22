@@ -61,11 +61,34 @@
 	opacity: 0;
 	transition: opacity @duration-normal @easing-out;
 	pointer-events: none;
+	// Sit explicitly above the <video> (z:0) within VideoPlayer's
+	// stacking context. Without this, on webOS the hardware video plane
+	// painted over the transport controls — user reported the picture
+	// bleeding through the play/pause buttons. Issue #3.
+	z-index: 10;
 
 	&.visible {
 		opacity: 1;
 		pointer-events: auto;
 	}
+}
+
+// Persistent top bar — title + back affordance. Outside .controlsOverlay
+// so it does NOT auto-hide along with the transport row. Users on first
+// launch don't realize the remote's Back button works, so the on-screen
+// "back" arrow needs to be reachable at all times. Issue #2.
+.persistentTopBar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 11;
+	display: flex;
+	align-items: center;
+	gap: @spacing-lg;
+	padding: @spacing-lg @safe-area-side;
+	background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+	pointer-events: auto;
 }
 
 .controls {

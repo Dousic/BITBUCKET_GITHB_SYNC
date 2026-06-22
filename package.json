@@ -11,15 +11,23 @@
         "// target": "Kept aligned with .enactrc to avoid divergent transpile targets.",
         "target": [
             "Chrome >= 69"
-        ]
+        ],
+        "// ilib": "Trim the bundled iLib locale data to only what the UI renders (en/es/ko). Without this, enact pack ships all 847 locale dirs (~79MB installed). Verify post-build: locale dir count should be <=15, not 847.",
+        "ilib": {
+            "locales": [
+                "en-US",
+                "es-419",
+                "ko-KR"
+            ]
+        }
     },
     "scripts": {
         "serve": "enact serve",
         "pack": "enact pack",
-        "pack-p": "enact pack -p && node scripts/patch-dist-html.js && node scripts/check-no-hlsjs.js",
+        "pack-p": "node scripts/pack-prod.js && node scripts/patch-dist-html.js && node scripts/trim-ilib-locales.js && node scripts/check-no-hlsjs.js",
         "clean": "enact clean",
-        "test": "enact test --env=jsdom",
-        "test-watch": "enact test --watch --env=jsdom",
+        "test": "enact test",
+        "test-watch": "enact test --watch",
         "lint": "enact lint --local --strict",
         "lint-fix": "enact lint --fix --local",
         "license": "enact license",

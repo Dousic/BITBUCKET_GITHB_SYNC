@@ -1,13 +1,20 @@
 # Dousic webOS — Icon & Art Assets
 
-This directory holds all visual assets referenced from `appinfo.json`. LG
-Content Store enforces exact specs — wrong dimensions are an automated
-rejection during cert. Generate these from the master brand files before
-every submission.
+This directory documents the art-asset specs and holds the store-listing
+artwork. LG Content Store enforces exact specs — wrong dimensions are an
+automated rejection during cert. Generate everything from the master brand
+files before every submission.
 
-## Required files
+## Launcher icons → `webos-meta/`
 
-| File | Dimensions | Format | Usage |
+The four build-consumed launcher assets live in `webos-meta/`, next to
+`appinfo.json`, and are referenced from it by bare filename. Enact's
+`WebOSMetaPlugin` resolves `appinfo.json` asset paths relative to the
+manifest's own directory and copies them to the app root in `dist/`, so
+they MUST sit beside the manifest — not here. Keeping a second copy in this
+directory only invites drift.
+
+| File (in `webos-meta/`) | Dimensions | Format | Usage |
 |------|------------|--------|-------|
 | `icon-80x80.png` | 80×80 | PNG with alpha | Small launcher icon |
 | `icon-256x256.png` | 256×256 | PNG with alpha | Focused launcher on webOS 6+ |

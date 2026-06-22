@@ -143,12 +143,13 @@ export const useViewPersistence = () => {
 	// reference and the Scroller re-binds its scroll listener on each
 	// render, which on long scrolls is a measurable churn.
 	const onScroll = useCallback((e) => {
-		const top =
+		// Named nextTop (not `top`) to avoid shadowing the window.top global.
+		const nextTop =
 			(typeof e?.scrollTop === 'number' && e.scrollTop) ||
 			(typeof e?.target?.scrollTop === 'number' && e.target.scrollTop) ||
 			(typeof e?.position?.y === 'number' && e.position.y) ||
 			0;
-		scrollTopRef.current = top;
+		scrollTopRef.current = nextTop;
 	}, []);
 
 	return {

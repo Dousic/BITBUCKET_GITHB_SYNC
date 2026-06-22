@@ -1,0 +1,23 @@
+{
+	"id": "com.dousic.app.dousic",
+	"version": "1.0.0",
+	"vendor": "Dousic Media Group LLC",
+	"type": "web",
+	"main": "index.html",
+	"title": "Dousic",
+	"appDescription": "Universal media platform for creators — stream shows, live broadcasts, and creator content on the big screen.",
+	"icon": "icon-80x80.png",
+	"largeIcon": "icon-256x256.png",
+	"bgImage": "bg-1920x1080.png",
+	"splashBackground": "splash-1920x1080.png",
+	"iconColor": "#0a0a0a",
+	"bgColor": "#0a0a0a",
+	"category": "APP_ENTERTAINMENT",
+	"requiredMemory": 256,
+	"handlesRelaunch": true,
+	"disableBackHistoryAPI": true,
+	"transparent": false,
+	"accessibility": {
+		"supportsAudioGuidance": true
+	}
+}
