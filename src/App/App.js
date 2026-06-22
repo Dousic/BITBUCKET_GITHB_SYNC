@@ -12,12 +12,10 @@
  * use Spottable() HoC or SpotlightContainerDecorator for their focusables.
  */
 
-import {useEffect, useState, useCallback} from 'react';
+import {useEffect} from 'react';
 import MoonstoneDecorator from '@enact/moonstone/MoonstoneDecorator';
 import Spotlight from '@enact/spotlight';
 import {Panels} from '@enact/moonstone/Panels';
-import kind from '@enact/core/kind';
-import PropTypes from 'prop-types';
 
 import {useAppStore} from '../state/appStore';
 import {useAuthStore} from '../state/authStore';
@@ -35,7 +33,6 @@ import {
 
 import luna from '../platform/luna';
 import telemetry from '../platform/telemetry';
-import api from '../services/api';
 import ws from '../services/ws';
 import {useContentStore} from '../state/contentStore';
 import {APP_VERSION} from '../version';
@@ -277,11 +274,19 @@ const AppBase = () => {
 		return <BootScreen />;
 	}
 
-	// If not authenticated and not already on login, gate to login
+	// If not authenticated and not already on login, gate to login.
+	//
+	// This branch renders outside the Panels view-stack, but the App-level
+	// back-key handler (registered above) still runs: on the login gate the
+	// stack is at root, so Back triggers showExit(). We must therefore render
+	// ExitConfirmation here too — otherwise Back would flip the exit state with
+	// nothing on screen to confirm it, leaving the remote apparently dead.
 	if (!isAuthenticated && currentView.name !== 'login') {
 		return (
 			<ErrorBoundary>
 				<LoginPanel />
+				{!network.connected && <OfflineBanner />}
+				{showExitConfirmation && <ExitConfirmation onCancel={hideExit} />}
 				<NotificationHost />
 			</ErrorBoundary>
 		);

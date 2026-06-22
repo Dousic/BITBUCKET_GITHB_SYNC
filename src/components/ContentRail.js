@@ -18,6 +18,7 @@ import Scroller from '@enact/moonstone/Scroller';
 import PropTypes from 'prop-types';
 
 import ContentCard from './ContentCard';
+import {toCardProps} from '../utils/content';
 import css from './ContentRail.module.less';
 
 const ContentRail = SpotlightContainerDecorator(
@@ -55,17 +56,7 @@ const ContentRail = SpotlightContainerDecorator(
 						{items.map((item) => (
 							<div key={item.id} className={css.slot}>
 								<ContentCard
-									id={item.id}
-									title={item.title}
-									thumbnailUrl={item.thumbnail_url || item.thumbnailUrl || item.cover_url || item.image_url || item.image || item.poster_url || item.backdrop_url}
-									subtitle={item.subtitle}
-									creator={item.creator?.handle || item.creator}
-									isLive={item.is_live || item.isLive}
-									viewerCount={item.viewer_count || item.viewerCount}
-									duration={item.duration}
-									type={item.type || item.media_type}
-									price={item.price ?? item.amount ?? item.cost}
-									isFree={item.is_free ?? item.isFree ?? item.free}
+									{...toCardProps(item)}
 									size={cardSize}
 									onSelect={() => onSelectItem?.(item)}
 								/>

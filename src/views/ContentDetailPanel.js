@@ -17,6 +17,7 @@ import {useAppStore} from '../state/appStore';
 import {useViewPersistence} from '../hooks/useViewPersistence';
 import {content as contentApi, user as userApi, resolveAssetUrl} from '../services/api';
 import ContentRail from '../components/ContentRail';
+import {isLiveItem, isFreePrice, formatPriceLabel} from '../utils/content';
 import telemetry from '../platform/telemetry';
 import Strings from '../i18n/strings';
 import css from './ContentDetailPanel.module.less';
@@ -93,20 +94,19 @@ const ContentDetailPanelBase = ({contentId}) => {
 		);
 	}
 
-	// Tolerate the various artwork field names the API may use.
+	// Tolerate the various artwork field names the API may use. Unlike a card
+	// thumbnail, the detail page wants the largest art, so backdrop/cover come
+	// first and the small thumbnail is the last resort.
 	const backdropArt = meta.backdrop_url || meta.cover_url || meta.image_url ||
 		meta.image || meta.poster_url || meta.thumbnail_url;
 	const logoArt = meta.logo_url || meta.logo;
 
 	// Price / "Free" label, mirroring dousic.media/market. Live streams are
-	// never priced. A paid item shows the formatted amount; everything else
-	// (explicitly free, $0, or no price) reads "Free".
+	// never priced.
 	const rawPrice = meta.price ?? meta.amount ?? meta.cost;
-	const priceAmount = typeof rawPrice === 'string' ? parseFloat(rawPrice) : rawPrice;
-	const isFreeContent = (meta.is_free ?? meta.isFree ?? meta.free) === true ||
-		priceAmount == null || Number.isNaN(priceAmount) || priceAmount <= 0;
-	const priceLabel = meta.is_live ? null :
-		(isFreeContent ? Strings.free() : `$${priceAmount.toFixed(2)}`);
+	const rawIsFree = meta.is_free ?? meta.isFree ?? meta.free;
+	const isFreeContent = isFreePrice(rawPrice, rawIsFree);
+	const priceLabel = isLiveItem(meta) ? null : formatPriceLabel(rawPrice, rawIsFree);
 
 	return (
 		<Panel className={css.panel}>

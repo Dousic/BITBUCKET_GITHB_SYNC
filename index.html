@@ -25,13 +25,20 @@
       does not. Re-add it ONLY if a runtime regression surfaces and you
       have time to QA a separate dev template.
 
+      script-src is 'self' only — there are NO inline <script> tags (the
+      splash is hidden from the bundled index.js, not an inline script), so
+      'unsafe-inline' is unnecessary and is omitted. LG cert flags
+      'unsafe-inline' in script-src on manual review. style-src keeps
+      'unsafe-inline' because the splash <style> block and Moonstone's
+      runtime style injection require it.
+
       `*.dousic-cdn.com` is a placeholder for the production HLS CDN host.
       Confirm with the streaming team before LG submission; if the CDN
       lives at a different domain (e.g. CloudFront, BunnyCDN), update
       this directive or playback will be CSP-blocked.
     -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self';
-               script-src 'self' 'unsafe-inline';
+               script-src 'self';
                connect-src 'self'
                  https://dousic.media
                  https://*.dousic.media

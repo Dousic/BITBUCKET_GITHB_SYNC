@@ -26,6 +26,7 @@ import {useContentStore} from '../state/contentStore';
 import {useAppStore} from '../state/appStore';
 import {useViewPersistence} from '../hooks/useViewPersistence';
 import ContentCard from '../components/ContentCard';
+import {toCardProps} from '../utils/content';
 import telemetry from '../platform/telemetry';
 import Strings from '../i18n/strings';
 import css from './BrowsePanel.module.less';
@@ -120,16 +121,7 @@ const BrowseGrid = SpotlightContainerDecorator(
                 {items.map((item) => (
                     <ContentCard
                         key={item.id}
-                        id={item.id}
-                        title={item.title}
-                        thumbnailUrl={item.thumbnail_url || item.cover_url || item.image_url || item.image || item.poster_url || item.backdrop_url}
-                        creator={item.creator?.handle}
-                        isLive={item.is_live}
-                        viewerCount={item.viewer_count}
-                        duration={item.duration}
-                        type={item.type || item.media_type}
-                        price={item.price ?? item.amount ?? item.cost}
-                        isFree={item.is_free ?? item.isFree ?? item.free}
+                        {...toCardProps(item)}
                         size="medium"
                         onSelect={() => onSelect(item)}
                     />

@@ -13,7 +13,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import {resolveAssetUrl} from '../services/api';
-import Strings from '../i18n/strings';
+import {formatPriceLabel, isFreePrice} from '../utils/content';
 import css from './ContentCard.module.less';
 
 const formatViewerCount = (n) => {
@@ -27,17 +27,6 @@ const formatDuration = (seconds) => {
 	const h = Math.floor(seconds / 3600);
 	const m = Math.floor((seconds % 3600) / 60);
 	return h > 0 ? `${h}h ${m}m` : `${m}m`;
-};
-
-// Marketplace price label, mirroring dousic.media/market: paid items show a
-// formatted currency amount, everything else (explicitly free, $0, or no
-// price set) reads "Free". `price` may arrive as a number or a numeric string.
-const formatPrice = (price, isFree) => {
-	const amount = typeof price === 'string' ? parseFloat(price) : price;
-	if (isFree || amount == null || Number.isNaN(amount) || amount <= 0) {
-		return Strings.free();
-	}
-	return `$${amount.toFixed(2)}`;
 };
 
 const ContentCardBase = ({
@@ -59,7 +48,7 @@ const ContentCardBase = ({
 	...rest
 }) => {
 	// Price shown for on-demand marketplace items (not live streams).
-	const priceLabel = !isLive ? formatPrice(price, isFree) : null;
+	const priceLabel = !isLive ? formatPriceLabel(price, isFree) : null;
 	// Marketplace media-type label (Audio / Video / …) shown as a corner pill,
 	// matching dousic.media. Tolerates a few field names from the API.
 	const typeLabel = typeof type === 'string' && type ?
@@ -134,7 +123,7 @@ const ContentCardBase = ({
 						<div className={css.subtitle}>{subtitle || creator}</div>
 					)}
 					{priceLabel && (
-						<div className={classNames(css.price, {[css.priceFree]: priceLabel === Strings.free()})}>
+						<div className={classNames(css.price, {[css.priceFree]: isFreePrice(price, isFree)})}>
 							{priceLabel}
 						</div>
 					)}

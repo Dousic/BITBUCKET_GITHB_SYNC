@@ -15,6 +15,7 @@ import {useContentStore} from '../state/contentStore';
 import {useAppStore} from '../state/appStore';
 import {useViewPersistence} from '../hooks/useViewPersistence';
 import ContentCard from '../components/ContentCard';
+import {toCardProps} from '../utils/content';
 import ws from '../services/ws';
 import telemetry from '../platform/telemetry';
 import Strings from '../i18n/strings';
@@ -46,12 +47,8 @@ const LiveGrid = SpotlightContainerDecorator(
 				{merged.map((item) => (
 					<ContentCard
 						key={item.id}
-						id={item.id}
-						title={item.title}
-						thumbnailUrl={item.thumbnail_url}
-						creator={item.creator?.handle || item.creator?.display_name}
+						{...toCardProps(item)}
 						isLive
-						viewerCount={item.viewer_count}
 						size="medium"
 						onSelect={() => onSelect(item)}
 					/>

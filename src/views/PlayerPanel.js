@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import {useAppStore} from '../state/appStore';
-import {content as contentApi, user as userApi} from '../services/api';
+import {content as contentApi} from '../services/api';
 import VideoPlayer from '../components/VideoPlayer';
 import {useBackKey, useCaptions} from '../hooks/usePlatform';
 import telemetry from '../platform/telemetry';

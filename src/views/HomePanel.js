@@ -21,14 +21,10 @@ import {useContentStore} from '../state/contentStore';
 import {useAppStore} from '../state/appStore';
 import {useViewPersistence} from '../hooks/useViewPersistence';
 import ContentRail from '../components/ContentRail';
+import {asItems, isLiveItem} from '../utils/content';
 import telemetry from '../platform/telemetry';
 import Strings from '../i18n/strings';
 import css from './HomePanel.module.less';
-
-// Normalize a /content/featured (or home featured) payload to an array,
-// whatever the backend wraps it in.
-const asItems = (d) =>
-	Array.isArray(d) ? d : (d?.items || d?.featured || d?.hero || d?.results || d?.data || []);
 
 const HomePanelBase = (props) => {
 	const home = useContentStore((s) => s.home);
@@ -48,7 +44,7 @@ const HomePanelBase = (props) => {
 	}, [loadHome, loadFeatured]);
 
 	const handleSelectCard = (item, railName) => {
-		if (item.is_live || item.isLive) {
+		if (isLiveItem(item)) {
 			pushView('player', {contentId: item.id});
 		} else {
 			pushView('content-detail', {contentId: item.id});
