@@ -47,7 +47,22 @@ export const useContentStore = create((set, get) => ({
 		}
 	},
 
-	// ----- Live streams -----
+	// ----- Featured (hero carousel) -----
+	//
+	// Sourced from /content/featured (the home payload doesn't carry a hero
+	// list). Non-fatal: if the endpoint is absent or errors, Home simply
+	// renders without the carousel rather than failing the whole view.
+	loadFeatured: async (force = false) => {
+		const cached = get().featured;
+		if (!force && !isStale(cached)) return cached.data;
+		try {
+			const data = await content.getFeatured();
+			set({featured: {data, fetchedAt: Date.now()}});
+			return data;
+		} catch (err) {
+			return null;
+		}
+	},
 
 	loadLive: async (filter = {}, force = false) => {
 		const cached = get().live;

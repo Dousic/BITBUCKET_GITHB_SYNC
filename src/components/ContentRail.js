@@ -63,6 +63,7 @@ const ContentRail = SpotlightContainerDecorator(
 									isLive={item.is_live || item.isLive}
 									viewerCount={item.viewer_count || item.viewerCount}
 									duration={item.duration}
+									type={item.type || item.media_type}
 									size={cardSize}
 									onSelect={() => onSelectItem?.(item)}
 								/>

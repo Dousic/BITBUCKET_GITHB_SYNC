@@ -26,10 +26,17 @@ import telemetry from '../platform/telemetry';
 import Strings from '../i18n/strings';
 import css from './HomePanel.module.less';
 
+// Normalize a /content/featured (or home hero) payload to an array,
+// whatever the backend wraps it in.
+const asItems = (d) =>
+	Array.isArray(d) ? d : (d?.items || d?.featured || d?.hero || d?.results || d?.data || []);
+
 const HomePanelBase = (props) => {
 	const home = useContentStore((s) => s.home);
+	const featured = useContentStore((s) => s.featured);
 	const isLoading = useContentStore((s) => s.isLoadingHome);
 	const loadHome = useContentStore((s) => s.loadHome);
+	const loadFeatured = useContentStore((s) => s.loadFeatured);
 	const pushView = useAppStore((s) => s.pushView);
 
 	// Restore scroll + focused card on remount (audit H6 follow-up).
@@ -37,8 +44,9 @@ const HomePanelBase = (props) => {
 
 	useEffect(() => {
 		loadHome().catch(() => {/* store tracks error */});
+		loadFeatured().catch(() => {/* non-fatal — carousel just stays hidden */});
 		telemetry.trackScreenView('home');
-	}, [loadHome]);
+	}, [loadHome, loadFeatured]);
 
 	const handlePlay = (item) => {
 		pushView('player', {contentId: item.id});
@@ -62,6 +70,10 @@ const HomePanelBase = (props) => {
 	};
 
 	const data = home?.data;
+	// Hero carousel items: prefer the dedicated /content/featured payload,
+	// fall back to a hero/featured list embedded in the home payload.
+	const featuredItems = asItems(featured?.data);
+	const heroItems = featuredItems.length > 0 ? featuredItems : (data?.hero || data?.featured || []);
 
 	return (
 		<Panel {...props} className={css.panel}>
@@ -77,9 +89,9 @@ const HomePanelBase = (props) => {
 					</div>
 				)}
 
-				{data?.hero?.length > 0 && (
+				{heroItems.length > 0 && (
 					<HeroCarousel
-						items={data.hero}
+						items={heroItems}
 						onPlay={handlePlay}
 						onMoreInfo={handleMoreInfo}
 					/>

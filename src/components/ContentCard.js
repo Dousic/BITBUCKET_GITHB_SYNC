@@ -37,10 +37,15 @@ const ContentCardBase = ({
 	isLive = false,
 	viewerCount,
 	duration,
+	type,
 	size = 'medium',
 	onSelect,
 	...rest
 }) => {
+	// Marketplace media-type label (Audio / Video / …) shown as a corner pill,
+	// matching dousic.media. Tolerates a few field names from the API.
+	const typeLabel = typeof type === 'string' && type ?
+		type.charAt(0).toUpperCase() + type.slice(1).toLowerCase() : null;
 	const handleSelect = useCallback(() => {
 		onSelect?.({id, title});
 	}, [id, title, onSelect]);
@@ -71,6 +76,10 @@ const ContentCardBase = ({
 						<span className={css.liveDot} />
 						LIVE
 					</div>
+				)}
+
+				{!isLive && typeLabel && (
+					<div className={css.typeBadge}>{typeLabel}</div>
 				)}
 
 				{viewerCount != null && isLive && (
@@ -106,6 +115,7 @@ ContentCardBase.propTypes = {
 	size: PropTypes.oneOf(['small', 'medium', 'large', 'wide']),
 	subtitle: PropTypes.string,
 	thumbnailUrl: PropTypes.string,
+	type: PropTypes.string,
 	viewerCount: PropTypes.number
 };
 

@@ -115,6 +115,7 @@ const BrowseGrid = SpotlightContainerDecorator(
                         isLive={item.is_live}
                         viewerCount={item.viewer_count}
                         duration={item.duration}
+                        type={item.type || item.media_type}
                         size="medium"
                         onSelect={() => onSelect(item)}
                     />

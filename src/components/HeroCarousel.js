@@ -53,6 +53,17 @@ const HeroCarouselBase = ({items = [], onPlay, onMoreInfo}) => {
 	if (items.length === 0) return null;
 
 	const current = items[index];
+	// Tolerate the various field names a featured item may carry (marketplace,
+	// home-hero, and creator payloads differ).
+	const backdrop = current.backdrop_url || current.cover_url || current.image_url ||
+		current.image || current.poster_url || current.thumbnail_url;
+	const logo = current.logo_url || current.logo;
+	const heroTitle = current.title || current.name || '';
+	const logline = current.logline || current.description || current.subtitle || current.tagline || '';
+	const genre = current.genre || current.genre_name ||
+		(Array.isArray(current.genres) ? current.genres[0] : null);
+	const durationLabel = current.duration_label || current.duration_text;
+	const isLive = current.is_live || current.isLive;
 
 	return (
 		<div
@@ -62,9 +73,9 @@ const HeroCarouselBase = ({items = [], onPlay, onMoreInfo}) => {
 			onKeyDown={handleKeyDown}
 		>
 			<div className={css.backdrop}>
-				{current.backdrop_url && (
+				{backdrop && (
 					<img
-						src={resolveAssetUrl(current.backdrop_url)}
+						src={resolveAssetUrl(backdrop)}
 						alt=""
 						className={css.backdropImage}
 						key={current.id}
@@ -74,19 +85,19 @@ const HeroCarouselBase = ({items = [], onPlay, onMoreInfo}) => {
 			</div>
 
 			<div className={css.content}>
-				{current.logo_url ? (
-					<img src={resolveAssetUrl(current.logo_url)} alt={current.title} className={css.logo} />
+				{logo ? (
+					<img src={resolveAssetUrl(logo)} alt={heroTitle} className={css.logo} />
 				) : (
-					<h1 className={css.title}>{current.title}</h1>
+					<h1 className={css.title}>{heroTitle}</h1>
 				)}
 
 				<div className={css.meta}>
-					{current.is_live && <span className={css.liveTag}><span className={css.liveDot} />LIVE NOW</span>}
-					{current.genre && <span className={css.genre}>{current.genre}</span>}
-					{current.duration_label && <span className={css.duration}>{current.duration_label}</span>}
+					{isLive && <span className={css.liveTag}><span className={css.liveDot} />LIVE NOW</span>}
+					{genre && <span className={css.genre}>{genre}</span>}
+					{durationLabel && <span className={css.duration}>{durationLabel}</span>}
 				</div>
 
-				<p className={css.logline}>{current.logline}</p>
+				<p className={css.logline}>{logline}</p>
 
 				<div className={css.actions}>
 					{/*
@@ -103,7 +114,7 @@ const HeroCarouselBase = ({items = [], onPlay, onMoreInfo}) => {
 						onClick={() => onPlay?.(current)}
 						spotlightId="hero-play"
 					>
-						{current.is_live ? Strings.home.watchLive() : Strings.home.play()}
+						{isLive ? Strings.home.watchLive() : Strings.home.play()}
 					</Button>
 					<Button
 						onClick={() => onMoreInfo?.(current)}
