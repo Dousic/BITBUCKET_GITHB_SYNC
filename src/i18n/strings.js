@@ -35,6 +35,8 @@ export default {
 	signIn:         () => $L('Sign in'),
 	signOut:        () => $L('Sign out'),
 	continueGuest:  () => $L('Continue as guest'),
+	// Marketplace price labels (mirrors dousic.media/market).
+	free:           () => $L('Free'),
 
 	// Nav
 	nav: {

@@ -121,6 +121,9 @@ const SearchResults = SpotlightContainerDecorator(
 						creator={item.creator?.handle}
 						isLive={item.is_live}
 						viewerCount={item.viewer_count}
+						type={item.type || item.media_type}
+						price={item.price ?? item.amount ?? item.cost}
+						isFree={item.is_free ?? item.isFree ?? item.free}
 						size="medium"
 						onSelect={() => onSelect(item)}
 					/>

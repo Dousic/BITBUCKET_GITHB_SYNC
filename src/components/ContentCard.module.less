@@ -75,6 +75,25 @@
 		.truncate();
 	}
 
+	// Marketplace price line in the overlay — paid amount in brand magenta,
+	// "Free" in green to read as a call-to-action, matching dousic.media/market.
+	.price {
+		display: inline-block;
+		margin-top: 8px;
+		padding: 3px 10px;
+		border-radius: @radius-sm;
+		background: rgba(0, 0, 0, 0.55);
+		color: @color-brand-primary;
+		font-size: @font-sm;
+		font-weight: @font-weight-bold;
+		letter-spacing: 0.02em;
+	}
+
+	.priceFree {
+		color: @color-brand-white;
+		background: @color-success;
+	}
+
 	.liveBadge {
 		position: absolute;
 		top: @spacing-sm;

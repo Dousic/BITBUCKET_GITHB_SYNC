@@ -13,6 +13,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import {resolveAssetUrl} from '../services/api';
+import Strings from '../i18n/strings';
 import css from './ContentCard.module.less';
 
 const formatViewerCount = (n) => {
@@ -28,6 +29,17 @@ const formatDuration = (seconds) => {
 	return h > 0 ? `${h}h ${m}m` : `${m}m`;
 };
 
+// Marketplace price label, mirroring dousic.media/market: paid items show a
+// formatted currency amount, everything else (explicitly free, $0, or no
+// price set) reads "Free". `price` may arrive as a number or a numeric string.
+const formatPrice = (price, isFree) => {
+	const amount = typeof price === 'string' ? parseFloat(price) : price;
+	if (isFree || amount == null || Number.isNaN(amount) || amount <= 0) {
+		return Strings.free();
+	}
+	return `$${amount.toFixed(2)}`;
+};
+
 const ContentCardBase = ({
 	id,
 	title,
@@ -38,12 +50,16 @@ const ContentCardBase = ({
 	viewerCount,
 	duration,
 	type,
+	price,
+	isFree,
 	size = 'medium',
 	onSelect,
 	className,
 	onKeyDown,
 	...rest
 }) => {
+	// Price shown for on-demand marketplace items (not live streams).
+	const priceLabel = !isLive ? formatPrice(price, isFree) : null;
 	// Marketplace media-type label (Audio / Video / …) shown as a corner pill,
 	// matching dousic.media. Tolerates a few field names from the API.
 	const typeLabel = typeof type === 'string' && type ?
@@ -117,6 +133,11 @@ const ContentCardBase = ({
 					{(subtitle || creator) && (
 						<div className={css.subtitle}>{subtitle || creator}</div>
 					)}
+					{priceLabel && (
+						<div className={classNames(css.price, {[css.priceFree]: priceLabel === Strings.free()})}>
+							{priceLabel}
+						</div>
+					)}
 				</div>
 			</div>
 		</div>
@@ -129,9 +150,11 @@ ContentCardBase.propTypes = {
 	className: PropTypes.string,
 	creator: PropTypes.string,
 	duration: PropTypes.number,
+	isFree: PropTypes.bool,
 	isLive: PropTypes.bool,
 	onSelect: PropTypes.func,
 	onKeyDown: PropTypes.func,
+	price: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 	size: PropTypes.oneOf(['small', 'medium', 'large', 'wide']),
 	subtitle: PropTypes.string,
 	thumbnailUrl: PropTypes.string,

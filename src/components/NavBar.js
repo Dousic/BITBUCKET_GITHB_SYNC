@@ -19,6 +19,7 @@
 import {useCallback, useState} from 'react';
 import Spottable from '@enact/spotlight/Spottable';
 import SpotlightContainerDecorator from '@enact/spotlight/SpotlightContainerDecorator';
+import Spotlight from '@enact/spotlight';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
@@ -66,20 +67,36 @@ NavIcon.propTypes = {icon: PropTypes.string.isRequired};
 // `onKeyDown` Enter handler, which could double-fire on certain remote
 // firmwares — see audit H4. Spottable also manages `tabIndex` internally;
 // the previous `tabIndex={-1}` (audit H5) fought that bookkeeping.
-const NavItemBase = ({id, label, icon, active, onSelect, className, onKeyDown, ...rest}) => {
+const NavItemBase = ({id, label, icon, active, onSelect, className, onKeyDown, prevId, nextId, ...rest}) => {
 	const handleSelect = useCallback(() => onSelect?.(id), [id, onSelect]);
 
-	// Activate on OK/Enter under 5-way (Spottable's built-in click emulation
-	// doesn't fire for our base-Spottable usage); still forward to Spotlight's
-	// onKeyDown so arrow navigation keeps working.
+	// Drive the nav explicitly:
+	//   OK/Enter  -> activate (Spottable's click emulation doesn't fire here)
+	//   Up/Down   -> move between nav items (Spotlight's spatial nav kept
+	//                leaking Down to the off-axis content grid instead of the
+	//                next item, so we move focus to the sibling ourselves)
+	//   other     -> forward to Spotlight (Right exits to content)
 	const handleKeyDown = useCallback((e) => {
-		if (e.keyCode === 13 || e.keyCode === 16777221) {
+		const k = e.keyCode;
+		if (k === 13 || k === 16777221) {
 			e.preventDefault();
 			handleSelect();
 			return;
 		}
+		if (k === 38 && prevId) {        // Up
+			e.preventDefault();
+			e.stopPropagation();
+			Spotlight.focus(prevId);
+			return;
+		}
+		if (k === 40 && nextId) {        // Down
+			e.preventDefault();
+			e.stopPropagation();
+			Spotlight.focus(nextId);
+			return;
+		}
 		onKeyDown?.(e);
-	}, [handleSelect, onKeyDown]);
+	}, [handleSelect, onKeyDown, prevId, nextId]);
 
 	const labelText = typeof label === 'function' ? label() : label;
 
@@ -109,8 +126,10 @@ NavItemBase.propTypes = {
 	label: PropTypes.oneOfType([PropTypes.string, PropTypes.func]).isRequired,
 	active: PropTypes.bool,
 	className: PropTypes.string,
+	nextId: PropTypes.string,
 	onSelect: PropTypes.func,
-	onKeyDown: PropTypes.func
+	onKeyDown: PropTypes.func,
+	prevId: PropTypes.string
 };
 
 const NavItem = Spottable(NavItemBase);
@@ -148,10 +167,13 @@ const NavBar = SpotlightContainerDecorator(
 				</div>
 
 				<div className={css.items}>
-					{NAV_ITEMS.map((item) => (
+					{NAV_ITEMS.map((item, i) => (
 						<NavItem
 							key={item.id}
 							{...item}
+							spotlightId={`nav-${item.id}`}
+							prevId={i > 0 ? `nav-${NAV_ITEMS[i - 1].id}` : null}
+							nextId={i < NAV_ITEMS.length - 1 ? `nav-${NAV_ITEMS[i + 1].id}` : null}
 							active={activeRoot === item.id}
 							onSelect={switchRoot}
 						/>

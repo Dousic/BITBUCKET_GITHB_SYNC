@@ -64,6 +64,8 @@ const ContentRail = SpotlightContainerDecorator(
 									viewerCount={item.viewer_count || item.viewerCount}
 									duration={item.duration}
 									type={item.type || item.media_type}
+									price={item.price ?? item.amount ?? item.cost}
+									isFree={item.is_free ?? item.isFree ?? item.free}
 									size={cardSize}
 									onSelect={() => onSelectItem?.(item)}
 								/>

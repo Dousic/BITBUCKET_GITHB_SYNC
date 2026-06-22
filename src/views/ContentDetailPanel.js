@@ -93,11 +93,26 @@ const ContentDetailPanelBase = ({contentId}) => {
 		);
 	}
 
+	// Tolerate the various artwork field names the API may use.
+	const backdropArt = meta.backdrop_url || meta.cover_url || meta.image_url ||
+		meta.image || meta.poster_url || meta.thumbnail_url;
+	const logoArt = meta.logo_url || meta.logo;
+
+	// Price / "Free" label, mirroring dousic.media/market. Live streams are
+	// never priced. A paid item shows the formatted amount; everything else
+	// (explicitly free, $0, or no price) reads "Free".
+	const rawPrice = meta.price ?? meta.amount ?? meta.cost;
+	const priceAmount = typeof rawPrice === 'string' ? parseFloat(rawPrice) : rawPrice;
+	const isFreeContent = (meta.is_free ?? meta.isFree ?? meta.free) === true ||
+		priceAmount == null || Number.isNaN(priceAmount) || priceAmount <= 0;
+	const priceLabel = meta.is_live ? null :
+		(isFreeContent ? Strings.free() : `$${priceAmount.toFixed(2)}`);
+
 	return (
 		<Panel className={css.panel}>
 			<div className={css.backdrop}>
-				{meta.backdrop_url && (
-					<img src={resolveAssetUrl(meta.backdrop_url)} alt="" className={css.backdropImage} />
+				{backdropArt && (
+					<img src={resolveAssetUrl(backdropArt)} alt="" className={css.backdropImage} />
 				)}
 				<div className={css.gradient} />
 			</div>
@@ -109,8 +124,8 @@ const ContentDetailPanelBase = ({contentId}) => {
 				className={css.scroller}
 			>
 				<div className={css.content}>
-					{meta.logo_url ? (
-						<img src={resolveAssetUrl(meta.logo_url)} alt={meta.title} className={css.logo} />
+					{logoArt ? (
+						<img src={resolveAssetUrl(logoArt)} alt={meta.title} className={css.logo} />
 					) : (
 						<h1 className={css.title}>{meta.title}</h1>
 					)}
@@ -125,6 +140,9 @@ const ContentDetailPanelBase = ({contentId}) => {
 						{meta.genre && <span>{meta.genre}</span>}
 						{meta.duration_label && <span>{meta.duration_label}</span>}
 						{meta.rating && <span className={css.rating}>{meta.rating}</span>}
+						{priceLabel && (
+							<span className={isFreeContent ? css.priceFree : css.price}>{priceLabel}</span>
+						)}
 					</div>
 
 					<p className={css.logline}>{meta.logline || meta.description}</p>

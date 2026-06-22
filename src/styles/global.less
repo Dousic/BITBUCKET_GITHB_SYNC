@@ -51,16 +51,12 @@ button { font-family: inherit; }
 // TV focus behavior
 // =========================================================================
 //
-// We suppress browser :hover effects in pointer-less remote mode and rely
-// entirely on native :focus, which Spotlight applies to the focused element.
-
-@media (hover: none) {
-	*:hover {
-		// Prevent hover states from firing on remote-only users
-		background-color: inherit !important;
-		transform: none !important;
-	}
-}
+// We rely entirely on native :focus (which Spotlight applies to the focused
+// element) for selection feedback — we define no :hover styles. A previous
+// blanket `@media (hover: none) *:hover { background-color: inherit }` rule
+// was removed: on webOS it forced the <video> element's background opaque on
+// pointer-hover, filling the hardware video plane's hole-punch and blacking
+// out playback whenever the cursor passed over the picture.
 
 // Smooth scale transition for focused elements. Enact applies focus via
 // native DOM :focus on the .spottable element (there is no

@@ -78,13 +78,34 @@
 	font-size: @font-sm;
 	margin-bottom: @spacing-md;
 
-	> span:not(.liveTag):not(.rating) {
+	> span:not(.liveTag):not(.rating):not(.price):not(.priceFree) {
 		&::after {
 			content: '·';
 			margin-left: @spacing-sm;
 		}
 		&:last-child::after { display: none; }
 	}
+}
+
+// Marketplace price chip — paid amount in brand magenta, "Free" in green,
+// matching dousic.media/market and the ContentCard overlay.
+.price,
+.priceFree {
+	padding: 2px 12px;
+	border-radius: @radius-sm;
+	font-size: @font-sm;
+	font-weight: @font-weight-bold;
+	letter-spacing: 0.02em;
+}
+
+.price {
+	background: rgba(255, 0, 255, 0.18);
+	color: @color-brand-primary-bright;
+}
+
+.priceFree {
+	background: @color-success;
+	color: @color-brand-white;
 }
 
 .liveTag {
