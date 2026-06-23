@@ -195,7 +195,7 @@ export const flushBeacon = () => {
 	const events = _buffer.splice(0);
 	try {
 		const apiUrl = process.env.REACT_APP_API_URL || 'https://api.dousic.media';
-		const url = apiUrl + '/api/webos/v1/telemetry/events';
+		const url = apiUrl + '/webos/v1/telemetry/events';
 		// sendBeacon with a Blob lets us set the content type — plain strings
 		// send as text/plain which our backend validator rejects.
 		const body = new Blob([JSON.stringify({events})], {type: 'application/json'});
