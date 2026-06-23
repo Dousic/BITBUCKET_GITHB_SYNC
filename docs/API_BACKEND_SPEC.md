@@ -1,7 +1,7 @@
 # Dousic webOS — Backend API Specification & Deployment Instructions
 
 **Audience:** Backend / API engineering team
-**Goal:** Stand up the real, correctly-formatted API at `https://dousic.media`
+**Goal:** Stand up the real, correctly-formatted API at `https://api.dousic.media`
 so the existing LG webOS IPK works end-to-end on a TV. This is **not** a
 request for a workaround in the app — the app is already finished and points at
 this contract. The blocker is purely server-side: the endpoints below must
@@ -9,11 +9,14 @@ exist, return the documented JSON shapes, serve assets over HTTPS from
 CSP-allowed hosts, and answer CORS preflights.
 
 > **Key fact for planning:** the shipped IPK is hard-wired to
-> `REACT_APP_API_URL=https://dousic.media` and calls
-> `https://dousic.media/api/webos/v1/...`. Once this spec is implemented and
-> live, **the same IPK works with no rebuild.** Do not stand the API up at
-> `api.dousic.media` — that hostname does not resolve and is not in the app's
-> security policy.
+> `REACT_APP_API_URL=https://api.dousic.media` and calls
+> `https://api.dousic.media/api/webos/v1/...`. The API lives on its own
+> subdomain (`api.dousic.media`) — consistent with `ws.dousic.media` and the
+> `*.dousic-cdn.com` asset hosts, and able to scale independently of the web
+> origin. The app's CSP already allows `https://*.dousic.media`, so this needs
+> **no policy change**. Deploy the API at `api.dousic.media` and the existing
+> IPK works with no rebuild. The consumer **pair web page stays on the main
+> origin at `https://dousic.media/pair`** (that's a web page, not an API call).
 
 ---
 
@@ -41,7 +44,8 @@ within that policy or the TV's browser will silently block it.
 ### 1.1 Hosts / DNS / TLS
 | Purpose | Host | Notes |
 |---|---|---|
-| REST API + pair web page | `https://dousic.media` | Valid, publicly-trusted TLS cert (LG validates chains; no self-signed). |
+| REST API | `https://api.dousic.media` | Own subdomain. Valid, publicly-trusted TLS cert (LG validates chains; no self-signed). |
+| Pair web page (consumer) | `https://dousic.media/pair` | Web page where the user redeems the on-screen code — main origin, not the API. |
 | Image / poster / logo assets | `https://*.dousic.media` **or** `https://*.dousic-cdn.com` | Must be HTTPS. |
 | Video / audio / HLS manifests + segments | `https://*.dousic-cdn.com` **or** `https://*.dousic.media` | Must be HTTPS. |
 | WebSocket (Reverb) | `wss://ws.dousic.media` | Port 443, TLS. Matches `wss://*.dousic.media`. |
@@ -88,9 +92,11 @@ Access-Control-Max-Age: 86400
   `Authorization`, which always triggers a preflight.
 
 ### 1.3 Transport contract
-- **Base:** `https://dousic.media/api/webos/v1`
-  (app config is the bare host `https://dousic.media`; the app appends
-  `/api/webos/v1`). Do not double the `/api`.
+- **Base:** `https://api.dousic.media/api/webos/v1`
+  (app config is the bare host `https://api.dousic.media`; the app appends the
+  `/api/webos/v1` path). Mount the API routes at `/api/webos/v1` on the
+  `api.dousic.media` subdomain. Do not add another `/api` in the env value or
+  the path would double to `/api/api/...`.
 - **Request headers sent by the app on every call:**
   `Content-Type: application/json`, `Accept: application/json`,
   `X-Dousic-Platform: webos`, `X-Dousic-Device-Id: <opaque-device-id>`, and
@@ -405,10 +411,10 @@ From a normal machine (simulating the TV's requests). Replace `$TOK` with a
 real access token where noted.
 
 ```bash
-BASE=https://dousic.media/api/webos/v1
+BASE=https://api.dousic.media/api/webos/v1
 
 # 1) TLS + reachability + CORS preflight
-curl -sI https://dousic.media | grep -i "HTTP/\|strict-transport"
+curl -sI https://api.dousic.media | grep -i "HTTP/\|strict-transport"
 curl -si -X OPTIONS $BASE/content/home \
   -H "Access-Control-Request-Method: GET" \
   -H "Access-Control-Request-Headers: authorization,x-dousic-platform" \
@@ -458,10 +464,11 @@ curl -sI "https://cdn.dousic-cdn.com/hls/c_123/master.m3u8" | grep -i "content-t
 
 ## 10. How to validate against the IPK on the TV
 
-1. Deploy the API per this spec to `https://dousic.media`.
-2. Sideload the existing IPK (no rebuild needed — it already targets
-   `dousic.media`). If reinstalling, close the running app first or install
-   over it to avoid `FAILED_REMOVE`.
+1. Deploy the API per this spec to `https://api.dousic.media` (and the consumer
+   pair page to `https://dousic.media/pair`).
+2. Sideload the IPK that targets `https://api.dousic.media` (the build shipped
+   alongside this revision of the spec). If reinstalling, close the running app
+   first or install over it to avoid `FAILED_REMOVE`.
 3. On the TV: a pairing code should appear → redeem at `dousic.media/pair` →
    Home populates with **real artwork** → open a title → **Play** streams →
    Live tiles update viewer counts.
@@ -501,4 +508,4 @@ curl -sI "https://cdn.dousic-cdn.com/hls/c_123/master.m3u8" | grep -i "content-t
 | POST | `/user/progress` | yes | `{ok}` |
 | POST | `/telemetry/events` | yes | `2xx` (optional) |
 
-All paths are under `https://dousic.media/api/webos/v1`.
+All paths are under `https://api.dousic.media/api/webos/v1`.
