@@ -7,7 +7,7 @@
  * Intentionally minimal chrome. The card is the content.
  */
 
-import {useCallback} from 'react';
+import {useCallback, useState} from 'react';
 import Spottable from '@enact/spotlight/Spottable';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -44,9 +44,12 @@ const ContentCardBase = ({
 	size = 'medium',
 	onSelect,
 	className,
-	onKeyDown,
 	...rest
 }) => {
+	// Fall back to the lettered placeholder if the artwork URL fails to load
+	// (broken/expired link, blocked host) instead of showing a black tile.
+	const [imgError, setImgError] = useState(false);
+
 	// Price shown for on-demand marketplace items (not live streams).
 	const priceLabel = !isLive ? formatPriceLabel(price, isFree) : null;
 	// Marketplace media-type label (Audio / Video / …) shown as a corner pill,
@@ -57,32 +60,26 @@ const ContentCardBase = ({
 		onSelect?.({id, title});
 	}, [id, title, onSelect]);
 
-	// Activate on OK/Enter explicitly. Spottable's built-in select->click
-	// emulation does not fire for our base-Spottable usage (verified: the
-	// card highlights under 5-way but OK/Enter never opened it), so we handle
-	// the select keys here and still forward to Spotlight's own onKeyDown so
-	// 5-way navigation keeps working.
-	const handleKeyDown = useCallback((e) => {
-		if (e.keyCode === 13 || e.keyCode === 16777221) {
-			e.preventDefault();
-			handleSelect();
-			return; // handled here; don't let Spottable also emulate a click
-		}
-		onKeyDown?.(e);
-	}, [handleSelect, onKeyDown]);
-
+	// Activation (OK/Enter) is handled globally by the Magic Remote OK-key
+	// bridge (platform/okKey.js), which synthesizes a click on the focused
+	// element. We only need onClick here; Spottable's injected onKeyDown
+	// (spread via `rest`) continues to drive 5-way navigation.
 	return (
 		<div
 			{...rest}
-			onKeyDown={handleKeyDown}
 			className={classNames(css.card, css[size], className, {[css.live]: isLive})}
 			onClick={handleSelect}
 			role="button"
 			aria-label={`${title}${creator ? ' by ' + creator : ''}`}
 		>
 			<div className={css.thumbnail}>
-				{thumbnailUrl ? (
-					<img src={resolveAssetUrl(thumbnailUrl)} alt="" className={css.image} />
+				{thumbnailUrl && !imgError ? (
+					<img
+						src={resolveAssetUrl(thumbnailUrl)}
+						alt=""
+						className={css.image}
+						onError={() => setImgError(true)}
+					/>
 				) : (
 					<div className={css.placeholder}>
 						<span>{title?.[0]?.toUpperCase() || 'D'}</span>
@@ -142,7 +139,6 @@ ContentCardBase.propTypes = {
 	isFree: PropTypes.bool,
 	isLive: PropTypes.bool,
 	onSelect: PropTypes.func,
-	onKeyDown: PropTypes.func,
 	price: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 	size: PropTypes.oneOf(['small', 'medium', 'large', 'wide']),
 	subtitle: PropTypes.string,

@@ -45,20 +45,12 @@ const GENRES = [
     { id: 'kids', label: () => Strings.browse.kids() }
 ];
 
-const GenreChipBase = ({ id, label, active, className, onSelect, onKeyDown, ...rest }) => {
+const GenreChipBase = ({ id, label, active, className, onSelect, ...rest }) => {
     const handleSelect = useCallback(() => onSelect?.(id), [id, onSelect]);
 
-    // Activate on OK/Enter under 5-way (Spottable's click emulation doesn't
-    // fire for our base-Spottable usage); forward other keys to Spotlight.
-    const handleKeyDown = useCallback((e) => {
-        if (e.keyCode === 13 || e.keyCode === 16777221) {
-            e.preventDefault();
-            handleSelect();
-            return;
-        }
-        onKeyDown?.(e);
-    }, [handleSelect, onKeyDown]);
-
+    // OK/Enter activation is handled globally by the Magic Remote OK-key
+    // bridge (platform/okKey.js); we only need onClick. Spottable's injected
+    // onKeyDown (via `rest`) keeps 5-way navigation working.
     // label is a function (locale-sensitive) — call it at render time
     const labelText = typeof label === 'function' ? label() : label;
 
@@ -67,7 +59,6 @@ const GenreChipBase = ({ id, label, active, className, onSelect, onKeyDown, ...r
             {...rest}
             className={classNames(css.chip, className, { [css.active]: active })}
             onClick={handleSelect}
-            onKeyDown={handleKeyDown}
             role="tab"
             aria-selected={active}
         >
@@ -81,8 +72,7 @@ GenreChipBase.propTypes = {
     label: PropTypes.oneOfType([PropTypes.string, PropTypes.func]).isRequired,
     active: PropTypes.bool,
     className: PropTypes.string,
-    onSelect: PropTypes.func,
-    onKeyDown: PropTypes.func
+    onSelect: PropTypes.func
 };
 
 const GenreChip = Spottable(GenreChipBase);

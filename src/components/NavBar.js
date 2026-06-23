@@ -70,19 +70,12 @@ NavIcon.propTypes = {icon: PropTypes.string.isRequired};
 const NavItemBase = ({id, label, icon, active, onSelect, className, onKeyDown, prevId, nextId, ...rest}) => {
 	const handleSelect = useCallback(() => onSelect?.(id), [id, onSelect]);
 
-	// Drive the nav explicitly:
-	//   OK/Enter  -> activate (Spottable's click emulation doesn't fire here)
-	//   Up/Down   -> move between nav items (Spotlight's spatial nav kept
-	//                leaking Down to the off-axis content grid instead of the
-	//                next item, so we move focus to the sibling ourselves)
-	//   other     -> forward to Spotlight (Right exits to content)
+	// Drive vertical nav explicitly. Spotlight's spatial nav kept leaking Down
+	// to the off-axis content grid instead of the next nav item, so we move
+	// focus to the sibling ourselves. Up/Down only — OK/Enter activation is
+	// handled globally by the Magic Remote OK-key bridge (platform/okKey.js).
 	const handleKeyDown = useCallback((e) => {
 		const k = e.keyCode;
-		if (k === 13 || k === 16777221) {
-			e.preventDefault();
-			handleSelect();
-			return;
-		}
 		if (k === 38 && prevId) {        // Up
 			e.preventDefault();
 			e.stopPropagation();
@@ -96,7 +89,7 @@ const NavItemBase = ({id, label, icon, active, onSelect, className, onKeyDown, p
 			return;
 		}
 		onKeyDown?.(e);
-	}, [handleSelect, onKeyDown, prevId, nextId]);
+	}, [onKeyDown, prevId, nextId]);
 
 	const labelText = typeof label === 'function' ? label() : label;
 

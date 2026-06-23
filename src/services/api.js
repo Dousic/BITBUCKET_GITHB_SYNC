@@ -38,15 +38,18 @@ export const API_BASE_URL = BASE_URL;
  * The webOS app is served from file://, so a backend that returns a
  * root-relative path like "/storage/posters/x.jpg" would otherwise resolve
  * to file:///storage/... and silently fail to load. Prefix those with the
- * API origin. Already-absolute (http/https/data/blob) and protocol-relative
- * URLs are passed through untouched.
+ * API origin. Protocol-relative ("//host/...") and bare http:// URLs are
+ * upgraded to https:// — the app's CSP img-src/media-src allow https (and
+ * data/blob) but not http, so an http asset URL would otherwise be blocked
+ * and render as a black tile. https/data/blob URLs pass through untouched.
  *
  * @param {string} url
  * @returns {string}
  */
 export const resolveAssetUrl = (url) => {
 	if (!url || typeof url !== 'string') return url;
-	if (/^(https?:|data:|blob:)/i.test(url)) return url;
+	if (/^(https:|data:|blob:)/i.test(url)) return url;
+	if (/^http:/i.test(url)) return url.replace(/^http:/i, 'https:');
 	if (url.startsWith('//')) return `https:${url}`;
 	return `${BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
 };

@@ -22,6 +22,9 @@
 	right: 0;
 	height: 80vh;
 	z-index: 0;
+	// Branded fallback so a missing or broken backdrop reads as the app, not a
+	// black void. The artwork (when it loads) sits on top via object-fit cover.
+	background: linear-gradient(135deg, @color-brand-primary-dim 0%, @color-bg 70%);
 
 	.backdropImage {
 		width: 100%;

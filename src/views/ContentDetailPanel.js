@@ -26,6 +26,10 @@ const ContentDetailPanelBase = ({contentId}) => {
 	const [meta, setMeta] = useState(null);
 	const [isInWatchlist, setIsInWatchlist] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
+	// Hide a broken backdrop/logo so the branded fallback gradient shows
+	// instead of a black rectangle or a missing-image icon.
+	const [backdropError, setBackdropError] = useState(false);
+	const [logoError, setLogoError] = useState(false);
 
 	const pushView = useAppStore((s) => s.pushView);
 	const notify = useAppStore((s) => s.notify);
@@ -111,8 +115,13 @@ const ContentDetailPanelBase = ({contentId}) => {
 	return (
 		<Panel className={css.panel}>
 			<div className={css.backdrop}>
-				{backdropArt && (
-					<img src={resolveAssetUrl(backdropArt)} alt="" className={css.backdropImage} />
+				{backdropArt && !backdropError && (
+					<img
+						src={resolveAssetUrl(backdropArt)}
+						alt=""
+						className={css.backdropImage}
+						onError={() => setBackdropError(true)}
+					/>
 				)}
 				<div className={css.gradient} />
 			</div>
@@ -124,8 +133,13 @@ const ContentDetailPanelBase = ({contentId}) => {
 				className={css.scroller}
 			>
 				<div className={css.content}>
-					{logoArt ? (
-						<img src={resolveAssetUrl(logoArt)} alt={meta.title} className={css.logo} />
+					{logoArt && !logoError ? (
+						<img
+							src={resolveAssetUrl(logoArt)}
+							alt={meta.title}
+							className={css.logo}
+							onError={() => setLogoError(true)}
+						/>
 					) : (
 						<h1 className={css.title}>{meta.title}</h1>
 					)}

@@ -33,6 +33,7 @@ import {
 
 import luna from '../platform/luna';
 import telemetry from '../platform/telemetry';
+import {installOkKeyHandler} from '../platform/okKey';
 import ws from '../services/ws';
 import {useContentStore} from '../state/contentStore';
 import {APP_VERSION} from '../version';
@@ -59,6 +60,10 @@ import BootScreen from '../components/BootScreen';
 
 // Global back handler must be installed before any useBackKey() is registered
 installGlobalBackKeyHandler();
+
+// Global Magic Remote OK-key bridge — activates the 5-way focused element so
+// OK works the same as it does under the pointer. See platform/okKey.js.
+installOkKeyHandler();
 
 const VIEW_COMPONENTS = {
 	home: HomePanel,
