@@ -24,8 +24,8 @@
         "lint-fix": "enact lint --fix --local",
         "license": "enact license",
         "preversion-check": "node scripts/check-version-sync.js",
-        "package": "npm run preversion-check && npm run pack-p && ares-package dist",
-        "deploy": "npm run package && ares-install com.dousic.app.dousic_$npm_package_version\\_all.ipk",
+        "package": "npm run preversion-check && npm run pack-p && ares-package dist -o build",
+        "deploy": "npm run package && ares-install build/com.dousic.app.dousic_$npm_package_version\\_all.ipk",
         "launch": "ares-launch com.dousic.app.dousic",
         "inspect": "ares-inspect --app com.dousic.app.dousic"
     },

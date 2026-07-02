@@ -24,7 +24,7 @@ Use these npm scripts when relevant:
 - `npm test`: Enact tests with `jsdom`.
 - `npm run pack`: development build.
 - `npm run pack-p`: production build plus project HLS guard.
-- `npm run package`: version check, production pack, and `ares-package dist`.
+- `npm run package`: version check, production pack, and `ares-package dist -o build` (IPK is written to `build/`).
 - `npm run deploy`, `npm run launch`, `npm run inspect`: webOS device workflow.
 
 Do not add new package scripts unless the task needs them and they fit the existing script style.

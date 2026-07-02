@@ -309,18 +309,24 @@ You should see:
 After `npm run pack-p` produces `dist/`, build the IPK:
 
 ```bash
-# One-shot: build + package
+# One-shot: build + package (writes the IPK to build/)
 npm run package
 
 # Or manually
 ares-package dist/
+
+# Set the IPK output path with -o / --outdir
+ares-package dist/ -o build
 ```
 
 The `ares-package` command:
 1. Copies `dist/` contents into a temp directory
 2. Reads `appinfo.json` (must be at the root of the source dir)
 3. Applies `.arespackageignore` patterns to exclude files
-4. Creates a Debian-format `.ipk` file in the current working directory
+4. Creates a Debian-format `.ipk` file. By default it lands in the current
+   working directory; pass `-o <dir>` (`--outdir`) to set the IPK path. The
+   `npm run package` script uses `-o build`, so the IPK is written to `build/`
+   (already gitignored), and `npm run deploy` installs it from there.
 
 ### Verify the IPK
 
@@ -822,7 +828,8 @@ npm run pack-p                               # Production build → dist/
 npm run clean                                # Remove dist/
 
 # Packaging
-ares-package dist/                           # Create IPK
+ares-package dist/                           # Create IPK (in cwd)
+ares-package dist/ -o build                  # Set IPK output path (--outdir)
 ares-package dist/ --sign-ipk \              # Signed production IPK
   --app-keystore seller.key \
   --ipk-signing-certificate seller.crt
