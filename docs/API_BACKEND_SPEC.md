@@ -10,7 +10,7 @@ CSP-allowed hosts, and answer CORS preflights.
 
 > **Key fact for planning:** the shipped IPK is hard-wired to
 > `REACT_APP_API_URL=https://api.dousic.media` and calls
-> `https://api.dousic.media/webos/v1/...`. The API lives on its own
+> `https://api.dousic.media/api/webos/v1/...`. The API lives on its own
 > subdomain (`api.dousic.media`) — consistent with `ws.dousic.media` and the
 > `*.dousic-cdn.com` asset hosts, and able to scale independently of the web
 > origin. The app's CSP already allows `https://*.dousic.media`, so this needs
@@ -92,12 +92,12 @@ Access-Control-Max-Age: 86400
   `Authorization`, which always triggers a preflight.
 
 ### 1.3 Transport contract
-- **Base:** `https://api.dousic.media/webos/v1`
+- **Base:** `https://api.dousic.media/api/webos/v1`
   (app config is the bare host `https://api.dousic.media`; the app appends the
-  `/webos/v1` path). Mount the API routes at `/webos/v1` on the
-  `api.dousic.media` subdomain. There is **no `/api` segment** — the subdomain
-  already denotes the API surface, so the full path is
-  `https://api.dousic.media/webos/v1/<endpoint>`.
+  `/api/webos/v1` path). Mount the API routes at `/api/webos/v1` on the
+  `api.dousic.media` subdomain — this is the prefix the API is deployed under
+  and the app is pinned to it, so the full path is
+  `https://api.dousic.media/api/webos/v1/<endpoint>`.
 - **Request headers sent by the app on every call:**
   `Content-Type: application/json`, `Accept: application/json`,
   `X-Dousic-Platform: webos`, `X-Dousic-Device-Id: <opaque-device-id>`, and
@@ -412,7 +412,7 @@ From a normal machine (simulating the TV's requests). Replace `$TOK` with a
 real access token where noted.
 
 ```bash
-BASE=https://api.dousic.media/webos/v1
+BASE=https://api.dousic.media/api/webos/v1
 
 # 1) TLS + reachability + CORS preflight
 curl -sI https://api.dousic.media | grep -i "HTTP/\|strict-transport"
@@ -509,4 +509,4 @@ curl -sI "https://cdn.dousic-cdn.com/hls/c_123/master.m3u8" | grep -i "content-t
 | POST | `/user/progress` | yes | `{ok}` |
 | POST | `/telemetry/events` | yes | `2xx` (optional) |
 
-All paths are under `https://api.dousic.media/webos/v1`.
+All paths are under `https://api.dousic.media/api/webos/v1`.

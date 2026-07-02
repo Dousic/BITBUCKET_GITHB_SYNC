@@ -14,7 +14,7 @@ endpoint returns*. Read both.)
 The LG webOS app is **finished and shipping**. It is hard-wired to call:
 
 ```
-https://api.dousic.media/webos/v1/<endpoint>
+https://api.dousic.media/api/webos/v1/<endpoint>
 ```
 
 It cannot be tested on a real TV until that API is live and conforms to the
@@ -23,8 +23,8 @@ host/path and the existing IPK works as-is.** Three things have repeatedly
 blocked us; fix these and we're unblocked:
 
 1. **The host must be exactly `api.dousic.media`** (its own subdomain, valid
-   public TLS) and routes mounted at **`/webos/v1`** (no `/api` segment — the
-   subdomain already means "API").
+   public TLS) and routes mounted at **`/api/webos/v1`** (the prefix the API is
+   currently deployed under; the app matches it exactly).
 2. **CORS for a `file://` origin.** The TV app runs from `file://`, so requests
    arrive with `Origin: null`. Every endpoint (incl. preflight `OPTIONS`) must
    return permissive CORS or the TV silently blocks the call.
@@ -39,8 +39,8 @@ blocked us; fix these and we're unblocked:
 | Concern | Value |
 |---|---|
 | API host | `api.dousic.media` (dedicated subdomain) |
-| API base path | `/webos/v1` |
-| Full base | `https://api.dousic.media/webos/v1` |
+| API base path | `/api/webos/v1` |
+| Full base | `https://api.dousic.media/api/webos/v1` |
 | Auth | Bearer access token (short-lived) + rotating refresh token |
 | Realtime | Laravel Reverb (Pusher protocol) at `wss://ws.dousic.media:443` |
 | Assets/media | HTTPS on `*.dousic-cdn.com` (preferred) or `*.dousic.media` |
@@ -65,13 +65,14 @@ the conventional `api.*` pattern. The app's CSP already allows
 
 ### 3.2 Route the subdomain to the API app
 - Point `api.dousic.media` at the Laravel app (separate vhost / ingress rule).
-- Mount the API under `/webos/v1`. In Laravel, e.g. `routes/api.php` or a
-  dedicated file loaded with a prefix:
+- The API is deployed under `/api/webos/v1` (Laravel's `routes/api.php` adds the
+  `/api` prefix; the group below adds `webos/v1`). Keep it there — the app is
+  built to match this exact path.
 
   ```php
-  // routes/webos.php  (registered in bootstrap/app.php or RouteServiceProvider)
+  // routes/api.php  (Laravel auto-prefixes this file with /api)
   Route::prefix('webos/v1')
-      ->middleware(['api', 'cors'])     // see CORS below
+      ->middleware(['api', 'cors'])     // see CORS below → final path /api/webos/v1
       ->group(function () {
           // auth (public)
           Route::post('/auth/pair/request', [PairController::class, 'request']);
@@ -106,8 +107,9 @@ the conventional `api.*` pattern. The app's CSP already allows
           });
       });
   ```
-- **Important:** do NOT also prefix with `/api`. The final path must be
-  `/webos/v1/...`, not `/api/webos/v1/...`.
+- **Important:** the final path must be exactly `/api/webos/v1/...`. If you move
+  the routes out of `routes/api.php`, add the `api/` prefix back yourself so the
+  path doesn't change (the app is pinned to `/api/webos/v1`).
 
 ### 3.3 CORS (the #1 thing that silently breaks file:// apps)
 The app uses Bearer tokens, not cookies, so the simplest correct config is a
@@ -115,7 +117,7 @@ wildcard origin and **no credentials**. In Laravel `config/cors.php`:
 
 ```php
 return [
-    'paths' => ['webos/v1/*'],
+    'paths' => ['api/webos/v1/*'],
     'allowed_methods' => ['GET', 'POST', 'DELETE', 'OPTIONS'],
     'allowed_origins' => ['*'],            // Bearer auth, no cookies
     'allowed_headers' => [
@@ -127,7 +129,7 @@ return [
     'supports_credentials' => false,       // MUST be false when origin is '*'
 ];
 ```
-- Ensure preflight **`OPTIONS`** on every `/webos/v1/*` route returns `204`
+- Ensure preflight **`OPTIONS`** on every `/api/webos/v1/*` route returns `204`
   with these headers (Laravel's `HandleCors` middleware does this if `paths`
   matches — verify it's in the global middleware stack).
 - The TV sends custom headers (`X-Dousic-*`) + `Authorization`, which always
@@ -153,7 +155,7 @@ return [
   (the TV fetches them cross-origin from `file://`).
 
 **Phase 0 done when:** `curl -sI https://api.dousic.media` is healthy, and an
-`OPTIONS https://api.dousic.media/webos/v1/content/home` returns the CORS
+`OPTIONS https://api.dousic.media/api/webos/v1/content/home` returns the CORS
 headers above.
 
 ---
@@ -262,7 +264,7 @@ class ViewerUpdate implements ShouldBroadcast {
 - Reverb app key must be `dousic-key-6ae2A2uIDb38GR3l`, TLS on, port 443.
 - This is enhancement-only; the app degrades gracefully if Reverb is down.
 
-**Telemetry (optional but recommended):** `POST /webos/v1/telemetry/events`
+**Telemetry (optional but recommended):** `POST /api/webos/v1/telemetry/events`
 accepts `{events:[…]}` (each `{type,timestamp,name?,message?,level?,properties?,context?}`)
 and returns `2xx`. Implement `TelemetryController::ingest()` to validate +
 sink; returning anything other than 2xx will surface as client errors.
@@ -283,7 +285,7 @@ sink; returning anything other than 2xx will surface as client errors.
 ## 9. Definition of done (hand back to QA when all true)
 
 Run the curl battery in **`docs/API_BACKEND_SPEC.md` §9** against
-`https://api.dousic.media/webos/v1`. All boxes in §9 must pass, specifically:
+`https://api.dousic.media/api/webos/v1`. All boxes in §9 must pass, specifically:
 
 - [ ] Valid public TLS on `api.dousic.media`, `ws.dousic.media`, asset hosts.
 - [ ] `OPTIONS` on every endpoint returns the CORS headers (§3.3).

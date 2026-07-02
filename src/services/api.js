@@ -23,9 +23,9 @@
 import {captureException} from '../platform/telemetry';
 
 const BASE_URL = process.env.REACT_APP_API_URL || 'https://api.dousic.media';
-// The API lives on the api.dousic.media subdomain, so the path needs no
-// redundant "/api" segment — endpoints are https://api.dousic.media/webos/v1/…
-const API_PATH = '/webos/v1';
+// The backend is deployed under an /api/webos/v1 route prefix, so endpoints are
+// https://api.dousic.media/api/webos/v1/<endpoint>. (Matches the live API.)
+const API_PATH = '/api/webos/v1';
 const TIMEOUT_MS = 30000;
 const MAX_RETRIES = 2;
 

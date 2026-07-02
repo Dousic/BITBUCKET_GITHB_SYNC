@@ -35,7 +35,7 @@ npm run serve                             # Dev server on :8080
 # With backend running (api on :8000, reverb on :8080):
 # - Log in via guest → lands on Home
 # - Click a live card → Player → video plays
-# - From a separate terminal: curl http://localhost:8000/webos/v1/debug/broadcast-test
+# - From a separate terminal: curl http://localhost:8000/api/webos/v1/debug/broadcast-test
 #   → LivePanel viewer counts should update in real time
 ```
 
