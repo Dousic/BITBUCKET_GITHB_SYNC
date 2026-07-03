@@ -32,18 +32,24 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 0 @spacing-md;
+		padding: 0 @spacing-sm;
 		margin-bottom: @spacing-xl;
+		height: 56px;
 
-		.logo {
-			font-size: @font-xl;
-			font-weight: @font-weight-black;
-			color: @color-text;
-			letter-spacing: -0.04em;
+		// Collapsed rail shows the hexagon mark; expanded shows the full
+		// horizontal lockup (mark + DOUSIC wordmark). Both are the real brand
+		// artwork — the old "d." wordmark is gone.
+		.logoMark {
+			height: 48px;
+			width: auto;
+			object-fit: contain;
 		}
 
-		.accent {
-			.gradient-text();
+		.logoLockup {
+			display: none;
+			height: 40px;
+			width: auto;
+			object-fit: contain;
 		}
 	}
 
@@ -109,4 +115,12 @@
 .navBar.expanded .item .label {
 	opacity: 1;
 	transform: translateX(0);
+}
+
+// Swap the mark for the full lockup when the rail expands.
+.navBar.expanded .brand .logoMark {
+	display: none;
+}
+.navBar.expanded .brand .logoLockup {
+	display: block;
 }

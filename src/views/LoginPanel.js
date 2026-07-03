@@ -19,6 +19,7 @@ import {auth as authApi, API_BASE_URL} from '../services/api';
 import {classifyPairPoll, isConnectivityError} from '../utils/pairing';
 import telemetry from '../platform/telemetry';
 import Strings from '../i18n/strings';
+import lockupUrl from '../assets/dousic-lockup.png';
 import css from './LoginPanel.module.less';
 
 const POLL_INTERVAL_MS = 3000;
@@ -187,7 +188,7 @@ const LoginPanelBase = () => {
 		<Panel className={css.panel}>
 			<div className={css.content}>
 				<div className={css.brand}>
-					<div className={css.logo}>dousic<span className={css.accent}>.</span></div>
+					<img className={css.logo} src={lockupUrl} alt={Strings.appName()} />
 					<div className={css.tagline}>{Strings.tagline()}</div>
 				</div>
 

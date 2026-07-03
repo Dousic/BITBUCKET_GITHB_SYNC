@@ -25,6 +25,8 @@ import PropTypes from 'prop-types';
 
 import {useAppStore} from '../state/appStore';
 import Strings from '../i18n/strings';
+import markUrl from '../assets/dousic-mark.png';
+import lockupUrl from '../assets/dousic-lockup.png';
 import css from './NavBar.module.less';
 
 // Labels are functions so they re-evaluate after locale change.
@@ -156,7 +158,8 @@ const NavBar = SpotlightContainerDecorator(
 				onBlur={handleBlur}
 			>
 				<div className={css.brand}>
-					<span className={css.logo}>d<span className={css.accent}>.</span></span>
+					<img className={css.logoMark} src={markUrl} alt={Strings.appName()} />
+					<img className={css.logoLockup} src={lockupUrl} alt={Strings.appName()} />
 				</div>
 
 				<div className={css.items}>

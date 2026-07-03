@@ -28,15 +28,9 @@
 	margin-bottom: @spacing-lg;
 
 	.logo {
-		font-size: @font-display;
-		font-weight: @font-weight-black;
-		color: @color-text;
-		letter-spacing: -0.04em;
-		text-shadow: @shadow-glow-primary;
-	}
-
-	.accent {
-		color: @color-brand-primary;
+		width: min(520px, 40vw);
+		height: auto;
+		filter: drop-shadow(0 12px 48px fade(@color-brand-primary, 45%));
 	}
 
 	.tagline {

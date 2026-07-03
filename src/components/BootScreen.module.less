@@ -11,15 +11,9 @@
 	z-index: @z-splash;
 
 	.mark {
-		font-size: @font-display;
-		font-weight: @font-weight-black;
-		letter-spacing: -0.04em;
-		color: @color-brand-white;
-		text-shadow: @shadow-glow-primary;
-	}
-
-	.accent {
-		color: @color-brand-primary;
+		width: min(560px, 42vw);
+		height: auto;
+		filter: drop-shadow(0 12px 48px fade(@color-brand-primary, 45%));
 	}
 
 	.tagline {
