@@ -128,6 +128,7 @@
 @radius-md: 8px;
 @radius-lg: 16px;
 @radius-xl: 24px;
+@radius-pill: 999px;
 
 // -------------------- Motion --------------------
 
@@ -152,6 +153,69 @@
 @shadow-card:      0 4px 20px rgba(0, 0, 0, 0.4);
 @shadow-card-hi:   0 12px 48px rgba(0, 0, 0, 0.6);
 @shadow-glow-primary:  0 0 48px rgba(221, 28, 120, 0.45);
+
+// -------------------- Redesign primitives (2.0) --------------------
+//
+// Shared building blocks so every screen speaks the same visual language as
+// the dousic.media redesign: glass surfaces, pink→magenta gradient pills,
+// uppercase eyebrows, gradient headlines. Adapted for 10-foot TV (larger type,
+// focus instead of hover). Import-available to every *.module.less.
+
+// Glassy elevated surface with a hairline border.
+.glass-panel(@alpha: 0.55) {
+	background: fade(@color-bg-elevated, (@alpha * 100));
+	border: 1px solid @color-line;
+	border-radius: @radius-lg;
+}
+
+// Uppercase eyebrow label (optionally preceded by a status dot).
+.eyebrow() {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	font-weight: @font-weight-bold;
+	font-size: @font-xs;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: @color-brand-primary;
+	background: fade(@color-brand-primary, 12%);
+	border: 1px solid fade(@color-brand-primary, 35%);
+	padding: 10px 22px;
+	border-radius: @radius-pill;
+}
+
+// Primary call-to-action: pink→magenta gradient pill with brand glow.
+.btn-primary() {
+	font-weight: @font-weight-bold;
+	color: #fff;
+	background: @gradient-brand;
+	border: none;
+	border-radius: @radius-pill;
+	box-shadow: 0 10px 30px fade(@color-brand-primary, 40%);
+}
+
+// Secondary/ghost pill.
+.btn-ghost() {
+	font-weight: @font-weight-medium;
+	color: @color-text;
+	background: fade(#ffffff, 5%);
+	border: 1px solid @color-line;
+	border-radius: @radius-pill;
+}
+
+// Gradient-filled text (headline accent word).
+.gradient-text() {
+	background: @gradient-brand;
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	color: transparent;
+}
+
+// Conic brand ring (avatars).
+.conic-ring() {
+	background: conic-gradient(from 200deg, @color-brand-primary, @color-brand-magenta, @color-gold, @color-brand-primary);
+}
 
 // -------------------- Utility mixins --------------------
 

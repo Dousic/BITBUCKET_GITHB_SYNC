@@ -38,6 +38,87 @@
 	animation: spin 900ms linear infinite;
 }
 
+// ---- Hero masthead (redesign) ----
+// Left-aligned to the rail gutter (@safe-area-side) so it never slides under
+// the nav rail, even while the rail is expanded.
+.hero {
+	position: relative;
+	padding: @spacing-sm @safe-area-side @spacing-md;
+	max-width: 1280px;
+
+	// Soft brand glow bleeding from the top, like the web hero.
+	&::before {
+		content: '';
+		position: absolute;
+		top: -140px;
+		left: 40px;
+		width: 620px;
+		height: 420px;
+		background: radial-gradient(ellipse at center, fade(@color-brand-primary, 16%), transparent 70%);
+		pointer-events: none;
+	}
+}
+
+.eyebrow {
+	.eyebrow();
+	margin-bottom: @spacing-md;
+}
+
+.eyebrowDot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: @color-success;
+	box-shadow: 0 0 12px @color-success;
+}
+
+.heroTitle {
+	font-size: 64px;
+	font-weight: @font-weight-black;
+	line-height: @line-height-tight;
+	letter-spacing: -0.02em;
+	color: @color-text;
+	margin-bottom: @spacing-sm;
+	max-width: 1100px;
+}
+
+.grad {
+	.gradient-text();
+}
+
+.heroSub {
+	font-size: @font-md;
+	color: @color-text-muted;
+	line-height: @line-height-normal;
+	max-width: 760px;
+	margin-bottom: @spacing-lg;
+}
+
+.stats {
+	display: flex;
+	align-items: center;
+	gap: @spacing-lg;
+
+	.stat {
+		b {
+			display: block;
+			font-size: @font-lg;
+			font-weight: @font-weight-black;
+			color: @color-text;
+		}
+		span {
+			font-size: @font-xs;
+			color: @color-text-muted;
+		}
+	}
+
+	.statDiv {
+		width: 1px;
+		height: 44px;
+		background: @color-line;
+	}
+}
+
 .rails {
 	padding-bottom: @spacing-xxl;
 }

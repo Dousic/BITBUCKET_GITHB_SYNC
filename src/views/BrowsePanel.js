@@ -155,6 +155,7 @@ const BrowsePanelBase = (props) => {
                 className={css.content}
             >
                 <header className={css.header}>
+                    <div className={css.eyebrow}>{Strings.browse.eyebrow()}</div>
                     <h1 className={css.title}>{Strings.browse.title()}</h1>
                 </header>
 

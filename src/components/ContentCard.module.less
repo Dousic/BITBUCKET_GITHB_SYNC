@@ -15,7 +15,8 @@
 		width: 100%;
 		background: @color-bg-card;
 		overflow: hidden;
-		border-radius: @radius-md;
+		border-radius: @radius-lg;
+		border: 1px solid @color-line;
 	}
 
 	.image {
@@ -122,13 +123,14 @@
 		position: absolute;
 		top: @spacing-sm;
 		right: @spacing-sm;
-		background: @color-brand-primary;
+		background: @gradient-brand;
 		color: @color-brand-white;
-		padding: 4px 12px;
-		border-radius: @radius-sm;
+		padding: 5px 14px;
+		border-radius: @radius-pill;
 		font-size: @font-xs;
 		font-weight: @font-weight-bold;
 		letter-spacing: 0.04em;
+		box-shadow: 0 6px 18px fade(@color-brand-primary, 40%);
 	}
 
 	.viewerCount {

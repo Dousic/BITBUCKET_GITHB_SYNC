@@ -6,10 +6,11 @@
 	left: 0;
 	bottom: 0;
 	width: @nav-width-collapsed;
-	// Solid background — `backdrop-filter: blur(16px)` was removed because it
-	// costs 20-40 FPS on webOS 4/5 hardware during nav transitions. The brand
-	// behind it is pure black, so solid + alpha is visually identical.
-	background: rgba(10, 10, 10, 0.96);
+	// Glassy maroon rail (redesign). `backdrop-filter: blur` is intentionally
+	// NOT used — it costs 20-40 FPS on webOS 4/5; a maroon→ink gradient over
+	// the dark app reads as the same frosted panel with zero perf cost.
+	background: linear-gradient(180deg, fade(@color-bg-elevated, 98%), fade(@color-bg, 98%));
+	border-right: 1px solid @color-line;
 	display: flex;
 	flex-direction: column;
 	z-index: @z-nav;
@@ -42,7 +43,7 @@
 		}
 
 		.accent {
-			color: @color-brand-primary;
+			.gradient-text();
 		}
 	}
 
@@ -59,7 +60,7 @@
 	display: flex;
 	align-items: center;
 	padding: @spacing-md @spacing-sm;
-	border-radius: @radius-md;
+	border-radius: @radius-pill;
 	color: @color-text-muted;
 	cursor: pointer;
 	outline: none;
@@ -77,31 +78,30 @@
 
 	.label {
 		font-size: @font-sm;
-		font-weight: @font-weight-medium;
+		font-weight: @font-weight-bold;
 		white-space: nowrap;
 		opacity: 0;
 		transform: translateX(-8px);
 		transition: all @duration-normal @easing-out;
 	}
 
+	// The web design's active nav pill: pink→magenta gradient fill + glow.
 	.activeIndicator {
-		position: absolute;
-		left: 0;
-		top: 20%;
-		bottom: 20%;
-		width: 4px;
-		background: @color-brand-primary;
-		border-radius: 0 @radius-sm @radius-sm 0;
+		display: none;
 	}
 
 	&.active {
-		color: @color-text;
+		color: #fff;
+		background: @gradient-brand;
+		box-shadow: 0 8px 24px fade(@color-brand-primary, 42%);
 	}
 
+	// Focus (5-way) replaces hover: pink ring + magenta glow lift.
 	&:focus {
-		background: @color-bg-card-focused;
-		color: @color-text;
-		outline: @focus-ring-width solid @focus-ring-color;
+		color: #fff;
+		background: @gradient-brand;
+		box-shadow: @focus-ring-glow;
+		transform: translateX(2px);
 	}
 }
 

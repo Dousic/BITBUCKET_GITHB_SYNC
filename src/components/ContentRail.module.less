@@ -5,12 +5,25 @@
 	position: relative;
 
 	.title {
+		display: flex;
+		align-items: center;
+		gap: @spacing-sm;
 		font-size: @font-lg;
-		font-weight: @font-weight-bold;
+		font-weight: @font-weight-black;
 		color: @color-text;
 		letter-spacing: -0.01em;
 		margin-bottom: @spacing-md;
 		padding-left: @safe-area-side;
+
+		// Gradient accent tick before each rail heading (redesign motif).
+		&::before {
+			content: '';
+			width: 6px;
+			height: 30px;
+			border-radius: @radius-pill;
+			background: @gradient-brand;
+			flex-shrink: 0;
+		}
 	}
 
 	// Moonstone Scroller needs a definite height. These budget for the

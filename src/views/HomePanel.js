@@ -17,6 +17,8 @@ import {Panel} from '@enact/moonstone/Panels';
 import Scroller from '@enact/moonstone/Scroller';
 import SpotlightContainerDecorator from '@enact/spotlight/SpotlightContainerDecorator';
 
+import $L from '@enact/i18n/$L';
+
 import {useContentStore} from '../state/contentStore';
 import {useAppStore} from '../state/appStore';
 import {useViewPersistence} from '../hooks/useViewPersistence';
@@ -25,6 +27,30 @@ import {asItems, isLiveItem} from '../utils/content';
 import telemetry from '../platform/telemetry';
 import Strings from '../i18n/strings';
 import css from './HomePanel.module.less';
+
+// Branded masthead mirroring the dousic.media redesign hero — non-focusable
+// (pure brand chrome), so it never interferes with 5-way focus on the rails.
+const HeroMasthead = () => (
+	<div className={css.hero}>
+		<div className={css.eyebrow}>
+			<span className={css.eyebrowDot} />
+			{$L('The creator-owned media platform')}
+		</div>
+		<h1 className={css.heroTitle}>
+			{$L('Own your work.')} <span className={css.grad}>{$L('Keep 70%.')}</span>
+		</h1>
+		<p className={css.heroSub}>
+			{$L('Audio, video, live, writing and art — stream anything from the creators you follow, and own what you make.')}
+		</p>
+		<div className={css.stats}>
+			<div className={css.stat}><b>70%</b><span>{$L('to the creator')}</span></div>
+			<span className={css.statDiv} />
+			<div className={css.stat}><b>100%</b><span>{$L('ownership, always')}</span></div>
+			<span className={css.statDiv} />
+			<div className={css.stat}><b>1 app</b><span>{$L('phone · tablet · TV')}</span></div>
+		</div>
+	</div>
+);
 
 const HomePanelBase = (props) => {
 	const home = useContentStore((s) => s.home);
@@ -75,6 +101,8 @@ const HomePanelBase = (props) => {
 						<div className={css.spinner} />
 					</div>
 				)}
+
+				<HeroMasthead />
 
 				<div className={css.rails}>
 					{featuredItems.length > 0 && (

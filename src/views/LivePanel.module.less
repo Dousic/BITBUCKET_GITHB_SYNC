@@ -30,10 +30,10 @@
 	.liveDot {
 		width: 16px;
 		height: 16px;
-		background: @color-brand-primary;
+		background: @color-live;
 		border-radius: 50%;
 		animation: livePulse 1.6s ease-in-out infinite;
-		box-shadow: 0 0 0 8px rgba(221, 28, 120, 0.2);
+		box-shadow: 0 0 0 8px fade(@color-live, 20%);
 	}
 
 	.subtitle {

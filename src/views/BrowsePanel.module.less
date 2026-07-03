@@ -17,6 +17,11 @@
 .header {
 	margin-bottom: @spacing-lg;
 
+	.eyebrow {
+		.eyebrow();
+		margin-bottom: @spacing-md;
+	}
+
 	.title {
 		font-size: @font-xxl;
 		font-weight: @font-weight-black;
@@ -35,24 +40,30 @@
 
 .chip {
 	padding: @spacing-sm @spacing-lg;
-	border-radius: 999px;
-	background: @color-bg-card;
+	border-radius: @radius-pill;
+	background: fade(#ffffff, 5%);
+	border: 1px solid @color-line;
 	color: @color-text-muted;
 	font-size: @font-sm;
-	font-weight: @font-weight-medium;
+	font-weight: @font-weight-bold;
 	cursor: pointer;
 	outline: none;
 	transition: all @duration-normal @easing-out;
 
+	// Focus (5-way) replaces hover.
 	&:focus {
-		outline: @focus-ring-width solid @color-brand-white;
+		color: #fff;
+		background: @gradient-brand;
+		border-color: transparent;
+		box-shadow: @focus-ring-glow;
 		transform: scale(1.08);
-		color: @color-text;
 	}
 
 	&.active {
-		background: @color-brand-primary;
+		background: @gradient-brand;
+		border-color: transparent;
 		color: @color-brand-white;
+		box-shadow: 0 8px 22px fade(@color-brand-primary, 40%);
 	}
 }
 

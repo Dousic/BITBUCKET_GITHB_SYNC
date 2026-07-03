@@ -67,6 +67,7 @@ export default {
 
 	// Browse
 	browse: {
+		eyebrow: () => $L('Discover'),
 		title:  () => $L('Browse'),
 		all:    () => $L('All'),
 		music:  () => $L('Music'),
