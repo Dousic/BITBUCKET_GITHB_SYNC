@@ -1,6 +1,6 @@
 {
 	"id": "com.dousic.app.dousic",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"vendor": "Dousic Media Group LLC",
 	"type": "web",
 	"main": "index.html",
@@ -10,8 +10,8 @@
 	"largeIcon": "icon-256x256.png",
 	"bgImage": "bg-1920x1080.png",
 	"splashBackground": "splash-1920x1080.png",
-	"iconColor": "#0a0a0a",
-	"bgColor": "#0a0a0a",
+	"iconColor": "#DD1C78",
+	"bgColor": "#0F0309",
 	"category": "APP_ENTERTAINMENT",
 	"requiredMemory": 256,
 	"handlesRelaunch": true,

@@ -339,7 +339,7 @@ AppBase.propTypes = {};
 
 // Wrap with MoonstoneDecorator — applies theme, font rendering, Spotlight
 const App = MoonstoneDecorator({
-	accentColor: '#FF00FF',
+	accentColor: '#DD1C78',
 	textSize: 'normal',
 	skin: 'dark',
 	overlay: false

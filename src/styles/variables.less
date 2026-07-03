@@ -6,59 +6,72 @@
 //   - 1920×1080 TV viewport (Enact scales to 4K automatically)
 //   - 10-foot viewing distance (2.5–3.5m from screen)
 //   - Dark mode primary (TV rooms are darker than desk environments)
-//   - Brand palette: bold black base, magenta primary (#FF00FF)
+//   - Brand palette (2.0 re-skin): maroon-black base, pink→magenta primary.
+//     Tokens mirror dousic-theme/tokens.css from the design handoff.
 
 // -------------------- Brand colors --------------------
 
-@color-brand-primary: #FF00FF;
-@color-brand-primary-dim: #CC00CC;
-@color-brand-primary-bright: #FF55FF;
+@color-brand-primary: #DD1C78;        // Dousic pink — primary accent / focus
+@color-brand-primary-dim: #B01560;    // darker pink for gradients/placeholders
+@color-brand-primary-bright: #D91CDD; // magenta — secondary / gradient end
+@color-brand-magenta: #D91CDD;
+@color-brand-pink-deep: #510026;
 
-@color-brand-black: #0a0a0a;
+@color-brand-black: #0F0309;          // ink
 @color-brand-white: #ffffff;
+
+// Coins / accent golds and semantics
+@color-gold: #FF8000;
 
 // -------------------- Surfaces --------------------
 
-@color-bg: #0a0a0a;
-@color-bg-elevated: #141414;
-@color-bg-card: #1a1a1a;
-@color-bg-card-focused: #2a2a2a;
-@color-bg-overlay: rgba(10, 10, 10, 0.92);
+@color-bg: #0F0309;                   // ink
+@color-bg-elevated: #1C0A13;          // panel
+@color-bg-card: #220915;              // card
+@color-bg-card-focused: #2E0F1D;
+@color-bg-well: #17060E;              // wells / inset fields
+@color-bg-overlay: rgba(15, 3, 9, 0.92);
 @color-bg-scrim: rgba(0, 0, 0, 0.78);
+@color-line: rgba(255, 255, 255, 0.09);
 
-// Radial gradient used in hero + boot screens
-@gradient-hero: radial-gradient(ellipse at center, #1a0e1a 0%, #0a0a0a 70%);
+// Radial gradient used in hero + boot screens (maroon → ink)
+@gradient-hero: radial-gradient(ellipse at center, #2B0716 0%, #0F0309 72%);
 @gradient-card: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.85) 100%);
+// Brand gradient (pink → magenta) — buttons, wordmark, focus accents
+@gradient-brand: linear-gradient(120deg, #DD1C78, #D91CDD);
 
 // -------------------- Text --------------------
 
-@color-text: #ffffff;
-@color-text-muted: #a8a8a8;
-@color-text-subtle: #6b6b6b;
+@color-text: #F4F1F7;
+@color-text-muted: #948D9C;
+@color-text-subtle: #6E6676;
 @color-text-disabled: #4a4a4a;
 @color-text-accent: @color-brand-primary;
 
 // -------------------- Semantic --------------------
 
-@color-success: #00c853;
-@color-warning: #ffab00;
-@color-error: #ff3d00;
-@color-live: @color-brand-primary;
+@color-success: #0FBF6F;
+@color-warning: #FF8000;
+@color-error: #FF3B3B;
+@color-live: #FF3B3B;
 @color-info: #448aff;
 
 // -------------------- Focus ring (Spotlight target) --------------------
+//
+// The single most brand-defining state on TV. Pink ring + magenta-tinted
+// glow so the focused element lifts off the maroon background.
 
-@focus-ring-color: @color-brand-white;
-@focus-ring-width: 4px;
+@focus-ring-color: @color-brand-primary;
+@focus-ring-width: 3px;
 @focus-ring-inset: 0;
-@focus-ring-glow: 0 0 0 @focus-ring-width @focus-ring-color, 0 8px 40px rgba(255, 0, 255, 0.35);
+@focus-ring-glow: 0 0 0 @focus-ring-width @color-brand-primary, 0 14px 40px rgba(221, 28, 120, 0.5);
 
 // -------------------- Typography --------------------
 //
-// LG TV default font is LG Smart UI. We declare it first, fall back to
-// Museo Sans (a common TV-industry default), then system sans-serif.
+// Poppins is the Dousic UI face; LG Smart UI / Museo Sans remain as cert-safe
+// fallbacks (and render if the bundled Poppins @font-face is unavailable).
 
-@font-family-base: 'LG Smart UI', 'Museo Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+@font-family-base: 'Poppins', 'LG Smart UI', 'Museo Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 @font-family-mono: 'LG Smart UI Mono', 'SF Mono', Menlo, monospace;
 
 // Sizes — calibrated for 1920×1080. Enact scales these for 4K.
@@ -138,7 +151,7 @@
 
 @shadow-card:      0 4px 20px rgba(0, 0, 0, 0.4);
 @shadow-card-hi:   0 12px 48px rgba(0, 0, 0, 0.6);
-@shadow-glow-primary:  0 0 48px rgba(255, 0, 255, 0.4);
+@shadow-glow-primary:  0 0 48px rgba(221, 28, 120, 0.45);
 
 // -------------------- Utility mixins --------------------
 
