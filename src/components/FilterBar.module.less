@@ -1,0 +1,115 @@
+@import '../styles/variables.less';
+
+.bar {
+	display: flex;
+	align-items: center;
+	gap: @spacing-sm;
+	flex-wrap: wrap;
+	// The open dropdown list is absolutely positioned; keep it above the rails.
+	position: relative;
+	z-index: @z-nav - 1;
+}
+
+.dropdown {
+	position: relative;
+}
+
+// ---- Trigger button ----
+.button {
+	display: inline-flex;
+	align-items: center;
+	gap: @spacing-sm;
+	padding: @spacing-sm @spacing-lg;
+	border-radius: @radius-pill;
+	background: fade(#ffffff, 5%);
+	border: 1px solid @color-line;
+	color: @color-text;
+	font-size: @font-sm;
+	font-weight: @font-weight-bold;
+	cursor: pointer;
+	outline: none;
+	transition: all @duration-normal @easing-out;
+
+	.caret { font-size: @font-xs; color: @color-text-muted; }
+
+	// Active (a value chosen) — pink outline + text.
+	&.buttonActive {
+		border-color: @color-brand-primary;
+		color: @color-brand-primary;
+		background: fade(@color-brand-primary, 10%);
+		.caret { color: @color-brand-primary; }
+	}
+
+	// Focus (5-way) — gradient pill + glow.
+	&:focus {
+		color: #fff;
+		background: @gradient-brand;
+		border-color: transparent;
+		box-shadow: @focus-ring-glow;
+		transform: scale(1.04);
+		.caret { color: #fff; }
+	}
+
+	&.buttonOpen { border-color: @color-brand-primary; }
+}
+
+// ---- Options list (popup) ----
+.list {
+	position: absolute;
+	top: calc(100% + 10px);
+	left: 0;
+	min-width: 280px;
+	max-height: 560px;
+	overflow-y: auto;
+	padding: @spacing-xs;
+	.glass-panel(0.98);
+	border-radius: @radius-lg;
+	box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+	z-index: @z-modal;
+}
+
+.option {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: @spacing-md;
+	padding: @spacing-sm @spacing-md;
+	border-radius: @radius-md;
+	color: @color-text;
+	font-size: @font-sm;
+	font-weight: @font-weight-medium;
+	cursor: pointer;
+	outline: none;
+	transition: background @duration-fast @easing-out, color @duration-fast @easing-out;
+
+	.check { color: @color-brand-primary; font-weight: @font-weight-bold; }
+
+	&.optionSel { color: @color-brand-primary; font-weight: @font-weight-bold; }
+
+	&:focus {
+		background: @gradient-brand;
+		color: #fff;
+		.check { color: #fff; }
+	}
+}
+
+// ---- Clear ----
+.clear {
+	padding: @spacing-sm @spacing-lg;
+	border-radius: @radius-pill;
+	background: transparent;
+	border: 1px solid @color-line;
+	color: @color-text-muted;
+	font-size: @font-sm;
+	font-weight: @font-weight-bold;
+	cursor: pointer;
+	outline: none;
+
+	&:focus {
+		color: #fff;
+		background: @gradient-brand;
+		border-color: transparent;
+		box-shadow: @focus-ring-glow;
+		transform: scale(1.04);
+	}
+}

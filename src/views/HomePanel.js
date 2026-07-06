@@ -12,7 +12,7 @@
  * First view most users see. Must feel cinematic, responsive, and personal.
  */
 
-import {useEffect} from 'react';
+import {useEffect, useState, useCallback} from 'react';
 import {Panel} from '@enact/moonstone/Panels';
 import Scroller from '@enact/moonstone/Scroller';
 import SpotlightContainerDecorator from '@enact/spotlight/SpotlightContainerDecorator';
@@ -23,10 +23,25 @@ import {useContentStore} from '../state/contentStore';
 import {useAppStore} from '../state/appStore';
 import {useViewPersistence} from '../hooks/useViewPersistence';
 import ContentRail from '../components/ContentRail';
-import {asItems, isLiveItem} from '../utils/content';
+import ContentCard from '../components/ContentCard';
+import FilterBar, {FILTER_DEFS} from '../components/FilterBar';
+import {content as contentApi} from '../services/api';
+import {asItems, isLiveItem, toCardProps} from '../utils/content';
 import telemetry from '../platform/telemetry';
 import Strings from '../i18n/strings';
 import css from './HomePanel.module.less';
+
+const EMPTY_FILTERS = {media: 'All', genre: 'All', vibe: 'All'};
+
+// Map the UI filter state to /content/browse query params (only non-"All").
+const filterParams = (filters) => {
+	const params = {};
+	if (filters.media !== 'All') params.media_type = filters.media;
+	if (filters.genre !== 'All') params.genre = filters.genre;
+	if (filters.vibe !== 'All') params.vibe = filters.vibe;
+	return params;
+};
+const anyActive = (filters) => FILTER_DEFS.some((f) => filters[f.key] !== 'All');
 
 // Branded masthead mirroring the dousic.media redesign hero — non-focusable
 // (pure brand chrome), so it never interferes with 5-way focus on the rails.
@@ -60,6 +75,13 @@ const HomePanelBase = (props) => {
 	const loadFeatured = useContentStore((s) => s.loadFeatured);
 	const pushView = useAppStore((s) => s.pushView);
 
+	// Marketplace-style filters (Media Types · Genres · Vibes). When any is set
+	// the curated rails are replaced by a filtered results grid.
+	const [filters, setFilters] = useState(EMPTY_FILTERS);
+	const [results, setResults] = useState([]);
+	const [isFiltering, setIsFiltering] = useState(false);
+	const filtered = anyActive(filters);
+
 	// Restore scroll + focused card on remount (audit H6 follow-up).
 	const persistence = useViewPersistence();
 
@@ -68,6 +90,24 @@ const HomePanelBase = (props) => {
 		loadFeatured().catch(() => {/* non-fatal — carousel just stays hidden */});
 		telemetry.trackScreenView('home');
 	}, [loadHome, loadFeatured]);
+
+	// Fetch filtered content whenever an active filter changes.
+	useEffect(() => {
+		if (!filtered) { setResults([]); return () => {}; }
+		let cancelled = false;
+		setIsFiltering(true);
+		contentApi.getBrowse(filterParams(filters))
+			.then((payload) => { if (!cancelled) setResults(asItems(payload)); })
+			.catch(() => { if (!cancelled) setResults([]); })
+			.finally(() => { if (!cancelled) setIsFiltering(false); });
+		telemetry.trackEvent('home_filter', filterParams(filters));
+		return () => { cancelled = true; };
+	}, [filters, filtered]);
+
+	const handleFilterChange = useCallback((key, value) => {
+		setFilters((f) => ({...f, [key]: value}));
+	}, []);
+	const handleClearFilters = useCallback(() => setFilters(EMPTY_FILTERS), []);
 
 	const handleSelectCard = (item, railName) => {
 		if (isLiveItem(item)) {
@@ -104,6 +144,35 @@ const HomePanelBase = (props) => {
 
 				<HeroMasthead />
 
+				<div className={css.filterWrap}>
+					<FilterBar filters={filters} onChange={handleFilterChange} onClear={handleClearFilters} />
+				</div>
+
+				{filtered ? (
+					<div className={css.results}>
+						{isFiltering ? (
+							<div className={css.loading}><div className={css.spinner} /></div>
+						) : results.length > 0 ? (
+							<>
+								<div className={css.resultsCount}>{Strings.filters.results(results.length)}</div>
+								<div className={css.grid}>
+									{results.map((item, i) => (
+										<ContentCard
+											key={item.id || i}
+											{...toCardProps(item)}
+											size="medium"
+											onSelect={() => handleSelectCard(item, 'filtered')}
+										/>
+									))}
+								</div>
+							</>
+						) : (
+							<div className={css.empty}>
+								<h2 className={css.emptyTitle}>{Strings.filters.empty()}</h2>
+							</div>
+						)}
+					</div>
+				) : (
 				<div className={css.rails}>
 					{featuredItems.length > 0 && (
 						<ContentRail
@@ -170,6 +239,7 @@ const HomePanelBase = (props) => {
 						/>
 					)}
 				</div>
+				)}
 			</Scroller>
 		</Panel>
 	);

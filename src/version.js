@@ -21,7 +21,7 @@
  * runtime — surfaces during smoke tests, not just at cert time.
  */
 
-const APP_VERSION = '1.1.2';
+const APP_VERSION = '1.1.3';
 
 export default APP_VERSION;
 export {APP_VERSION};

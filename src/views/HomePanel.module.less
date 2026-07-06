@@ -119,6 +119,44 @@
 	}
 }
 
+// Filter bar sits under the hero, aligned to the rail gutter. Extra bottom
+// space so an open dropdown has room to overlay the content below.
+.filterWrap {
+	padding: 0 @safe-area-side @spacing-md;
+	position: relative;
+	z-index: 5;
+}
+
+.results {
+	padding: 0 @safe-area-side @spacing-xxl;
+
+	.resultsCount {
+		font-size: @font-sm;
+		color: @color-text-muted;
+		font-weight: @font-weight-bold;
+		margin-bottom: @spacing-md;
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: @spacing-xl @spacing-md;
+		padding-top: 40px;
+	}
+	.grid > * { width: 100%; }
+
+	.empty {
+		text-align: center;
+		padding: @spacing-xxl;
+
+		.emptyTitle {
+			font-size: @font-xl;
+			font-weight: @font-weight-bold;
+			color: @color-text;
+		}
+	}
+}
+
 .rails {
 	padding-bottom: @spacing-xxl;
 }

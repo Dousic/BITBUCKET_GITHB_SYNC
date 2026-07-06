@@ -495,7 +495,7 @@ curl -sI "https://cdn.dousic-cdn.com/hls/c_123/master.m3u8" | grep -i "content-t
 | POST | `/auth/login` | no | `{access_token, refresh_token, user}` |
 | GET  | `/content/home` | yes | `{continue_watching, live_now, featured_creators, trending, new_releases}` |
 | GET  | `/content/featured` | yes | `{items}` |
-| GET  | `/content/browse` | yes | `{items, genres}` |
+| GET  | `/content/browse?media_type=&genre=&vibe=` | yes | `{items, genres}` (Home filter dropdowns) |
 | GET  | `/content/live` | yes | `{items}` |
 | GET  | `/content/search?q=` | yes | `{results}` |
 | GET  | `/content/feed?tab=` | yes | `{items}` (feed posts — see below) |

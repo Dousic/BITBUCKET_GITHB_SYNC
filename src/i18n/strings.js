@@ -66,6 +66,16 @@ export default {
 		moreInfo:          () => $L('More info')
 	},
 
+	// Marketplace filters (Media Types · Genres · Vibes) — mirrors dousic.media
+	filters: {
+		media:   () => $L('Media Types'),
+		genre:   () => $L('Genres'),
+		vibe:    () => $L('Vibes'),
+		clear:   () => $L('Clear filters'),
+		results: (n) => $L('{count} results').replace('{count}', n),
+		empty:   () => $L('Nothing matches these filters')
+	},
+
 	// Feed
 	feed: {
 		eyebrow:    () => $L('Discover'),
