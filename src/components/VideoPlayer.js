@@ -38,6 +38,7 @@ import SpotlightContainerDecorator, {spotlightDefaultClass} from '@enact/spotlig
 import Spotlight from '@enact/spotlight';
 
 import {getWebOSMajorVersion} from '../platform/luna';
+import {createWebRTCPlayer} from '../platform/antmedia';
 import {useScreensaverControl} from '../hooks/usePlatform';
 import telemetry from '../platform/telemetry';
 import {user as userApi, resolveAssetUrl} from '../services/api';
@@ -54,6 +55,13 @@ const NATIVE_HLS_ONLY = process.env.REACT_APP_NATIVE_HLS_ONLY === 'true';
 const PROTOCOL_HLS = 'hls';
 const PROTOCOL_AUDIO = 'audio';
 const PROTOCOL_VIDEO = 'video';
+const PROTOCOL_WEBRTC = 'webrtc';
+
+// How long to wait for the WebRTC MediaStream to arrive before giving up and
+// falling back to the HLS manifest. On a TV behind a restrictive NAT, ICE can
+// stall indefinitely; 6s is long enough for a healthy TURN relay to connect
+// yet short enough that the viewer isn't left staring at a black screen.
+const WEBRTC_TIMEOUT_MS = 6000;
 
 // The backend now sends `protocol` ('hls' | 'video' | 'audio'). Older builds
 // (and some test fixtures) may omit it, so we sniff the URL extension as a
@@ -75,6 +83,7 @@ const VideoPlayer = forwardRef(({
 	contentId,
 	streamUrl,
 	protocol,
+	webrtc,             // Ant Media WebRTC config {ws_url, stream_id, token, ice_servers}
 	posterUrl,
 	drmScheme,          // unused in MVP; kept on props for future DRM path
 	drmLicenseUrl,      // unused in MVP
@@ -88,6 +97,7 @@ const VideoPlayer = forwardRef(({
 }, ref) => {
 	const videoRef = useRef();
 	const hlsRef = useRef();
+	const webrtcRef = useRef();
 	const progressTimer = useRef();
 	const onErrorRef = useRef(onError);
 	const onPlayingRef = useRef(onPlaying);
@@ -137,18 +147,11 @@ const VideoPlayer = forwardRef(({
 		setState('loading');
 		setError(null);
 
-		const setup = async () => {
-			// MVP DRM stub — we ship unencrypted only. If a non-null drmScheme
-			// arrives, record it for telemetry but don't attempt EME attach.
-			if (drmScheme) {
-				telemetry.captureMessage(
-					'DRM-protected content requested but DRM is not available in MVP',
-					'warning',
-					{contentId, drmScheme}
-				);
-			}
-
-			const playbackProtocol = normalizeProtocol(protocol, streamUrl);
+		// Standard (non-WebRTC) playback: HLS manifest, direct video, or audio.
+		// Also serves as the HLS fallback when a WebRTC live attempt fails or
+		// times out, so it's forced onto PROTOCOL_HLS in that case.
+		const startStandard = async (protocolToUse) => {
+			const playbackProtocol = protocolToUse || normalizeProtocol(protocol, streamUrl);
 
 			// Direct media — `protocol === 'video' | 'audio'`. Hand the URL
 			// to the HTML5 element directly. The native-HLS / hls.js paths
@@ -233,10 +236,104 @@ const VideoPlayer = forwardRef(({
 			}
 		};
 
+		// Ant Media WebRTC ultra-low-latency live. Prefer WebRTC when the
+		// backend advertises it; if ICE/negotiation stalls or fails, fall back
+		// to the HLS manifest in `streamUrl` so live still plays. This keeps the
+		// TV on sub-second latency where the network allows it, without ever
+		// stranding the viewer on a black screen where it doesn't.
+		const startWebRTC = () => {
+			let settled = false;
+			let fallbackTimer = null;
+
+			const toHls = (reason) => {
+				if (settled || !mounted) return;
+				settled = true;
+				if (fallbackTimer) { clearTimeout(fallbackTimer); fallbackTimer = null; }
+				if (webrtcRef.current) {
+					try { webrtcRef.current.stop(); } catch (_) { /* noop */ }
+					webrtcRef.current = null;
+				}
+				try { video.srcObject = null; } catch (_) { /* noop */ }
+				telemetry.captureMessage('WebRTC live fell back to HLS', 'info', {contentId, reason});
+				// Live always arrives as an HLS manifest in streamUrl; force it.
+				startStandard(PROTOCOL_HLS);
+			};
+
+			const player = createWebRTCPlayer({
+				wsUrl: webrtc.ws_url,
+				streamId: webrtc.stream_id,
+				token: webrtc.token,
+				iceServers: webrtc.ice_servers,
+				onStream: (stream) => {
+					if (settled || !mounted) return;
+					settled = true;
+					if (fallbackTimer) { clearTimeout(fallbackTimer); fallbackTimer = null; }
+					video.srcObject = stream;
+					video.play().catch(handlePlaybackError);
+				},
+				onStatus: (status) => {
+					// A finished live stream is a normal end-of-broadcast, not
+					// an error — surface it as `ended` so the panel can react.
+					if (status === 'play_finished' && mounted && settled) {
+						setState('ended');
+						onEndedRef.current?.();
+					}
+				},
+				onError: () => {
+					// Before we have a stream, any error means fall back to HLS.
+					// After we have a stream, a drop ends the (live) session.
+					if (!settled) {
+						toHls('error');
+					} else if (mounted) {
+						setState('ended');
+						onEndedRef.current?.();
+					}
+				}
+			});
+			webrtcRef.current = player;
+
+			// Hard timeout — if no MediaStream has arrived, ICE is stalled
+			// (blocked UDP / no TURN reachable). Fall back to HLS.
+			fallbackTimer = setTimeout(() => toHls('timeout'), WEBRTC_TIMEOUT_MS);
+
+			player.play();
+		};
+
+		const setup = async () => {
+			// MVP DRM stub — we ship unencrypted only. If a non-null drmScheme
+			// arrives, record it for telemetry but don't attempt EME attach.
+			if (drmScheme) {
+				telemetry.captureMessage(
+					'DRM-protected content requested but DRM is not available in MVP',
+					'warning',
+					{contentId, drmScheme}
+				);
+			}
+
+			const requestedProtocol = normalizeProtocol(protocol, streamUrl);
+
+			// WebRTC live — only when the backend sent a usable webrtc config
+			// (signaling URL + stream id). Otherwise treat it as HLS live.
+			if (requestedProtocol === PROTOCOL_WEBRTC && webrtc && webrtc.ws_url && webrtc.stream_id) {
+				startWebRTC();
+				return;
+			}
+
+			startStandard();
+		};
+
 		setup();
 
 		return () => {
 			mounted = false;
+			if (webrtcRef.current) {
+				try {
+					webrtcRef.current.stop();
+				} catch (_) {
+					// Best effort cleanup.
+				}
+				webrtcRef.current = null;
+			}
 			if (hlsRef.current) {
 				try {
 					hlsRef.current.destroy();
@@ -251,10 +348,15 @@ const VideoPlayer = forwardRef(({
 				} catch (_) {
 					// Best effort cleanup.
 				}
+				try {
+					video.srcObject = null;
+				} catch (_) {
+					// Best effort cleanup.
+				}
 				video.src = '';
 			}
 		};
-	}, [streamUrl, protocol, drmScheme, drmLicenseUrl, startPosition, contentId, handlePlaybackError]);
+	}, [streamUrl, protocol, webrtc, drmScheme, drmLicenseUrl, startPosition, contentId, handlePlaybackError]);
 
 	// Video event listeners
 	useEffect(() => {
@@ -447,7 +549,16 @@ VideoPlayer.propTypes = {
 	// Optional; if absent we fall back to URL sniffing.
 	protocol: PropTypes.string,
 	startPosition: PropTypes.number,
-	streamUrl: PropTypes.string
+	streamUrl: PropTypes.string,
+	// Ant Media WebRTC signaling config for ultra-low-latency live. When
+	// present and `protocol === 'webrtc'`, the player negotiates a WebRTC
+	// session and falls back to the HLS `streamUrl` on timeout/failure.
+	webrtc: PropTypes.shape({
+		ws_url: PropTypes.string,
+		stream_id: PropTypes.string,
+		token: PropTypes.string,
+		ice_servers: PropTypes.array
+	})
 };
 
 export default VideoPlayer;

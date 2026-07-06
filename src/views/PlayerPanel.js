@@ -369,6 +369,7 @@ const PlayerPanelBase = ({contentId, isLive: isLiveProp}) => {
 					contentId={contentId}
 					streamUrl={streamConfig.url}
 					protocol={streamConfig.protocol}
+					webrtc={streamConfig.webrtc}
 					posterUrl={meta?.backdrop_url || meta?.cover_url || meta?.image_url || meta?.image || meta?.poster_url || meta?.thumbnail_url}
 					drmScheme={streamConfig.drm_scheme}
 					drmLicenseUrl={streamConfig.drm_license_url}

@@ -279,6 +279,8 @@ Full object (§4.2):
 ```
 
 ### 3.7 `GET /content/{id}/stream` — playback config (§4.3)
+
+Video-on-demand (HLS):
 ```json
 {
   "url": "https://cdn.dousic-cdn.com/hls/c_123/master.m3u8",
@@ -287,6 +289,29 @@ Full object (§4.2):
   "drm_license_url": null
 }
 ```
+
+Live via Ant Media WebRTC (ultra-low latency, sub-second) — see §5.1 and
+`docs/BACKEND_ANTMEDIA.md` for the full spec:
+```json
+{
+  "protocol": "webrtc",
+  "webrtc": {
+    "ws_url": "wss://live.dousic.media/WebRTCAppEE/websocket",
+    "stream_id": "s_live_123",
+    "token": "<one-time play token or empty string>",
+    "ice_servers": [
+      { "urls": "stun:live.dousic.media:3478" },
+      { "urls": "turn:live.dousic.media:3478?transport=udp", "username": "u", "credential": "p" },
+      { "urls": "turn:live.dousic.media:443?transport=tcp",  "username": "u", "credential": "p" }
+    ]
+  },
+  "url": "https://live.dousic.media/WebRTCAppEE/streams/s_live_123.m3u8",
+  "drm_scheme": null,
+  "drm_license_url": null
+}
+```
+The app **prefers WebRTC** and automatically **falls back to the HLS `url`**
+if ICE stalls or negotiation fails, so `url` is required even for `webrtc`.
 
 ### 3.8 Creators
 - `GET /creators?<params>` → `{ "items": [ creator items ] }`
@@ -332,10 +357,24 @@ handle}`, `is_live`, `resume_position` (sec; >0 shows "Resume"), `in_watchlist`
 ### 4.3 Stream config (`GET /content/{id}/stream`)
 | Field | Type | Notes |
 |---|---|---|
-| **`url`** | https URL | HLS `.m3u8`, or direct `.mp4`/`.mp3`. Host must be CSP-allowed (§1.1) and **HTTPS**. |
-| **`protocol`** | string | **`"hls"`** for manifests, **`"video"`** for direct mp4, **`"audio"`** for mp3. Drives the player path — required. |
+| **`url`** | https URL | HLS `.m3u8`, or direct `.mp4`/`.mp3`. Host must be CSP-allowed (§1.1) and **HTTPS**. For `protocol:"webrtc"` this is the **HLS fallback manifest** and is still required. |
+| **`protocol`** | string | **`"hls"`** for manifests, **`"video"`** for direct mp4, **`"audio"`** for mp3, **`"webrtc"`** for Ant Media ultra-low-latency live. Drives the player path — required. |
+| `webrtc` | object | **Required when `protocol:"webrtc"`.** Ant Media signaling config — see below and §5.1. |
 | `drm_scheme` | null | Keep **null** for MVP (unencrypted). A non-null value triggers a DRM stub that will not play. |
 | `drm_license_url` | null | MVP: null. |
+
+**`webrtc` object** (only when `protocol:"webrtc"`):
+| Field | Type | Req | Notes |
+|---|---|---|---|
+| **`ws_url`** | wss URL | ✅ | Ant Media WebSocket signaling endpoint. **Must be `wss://` on a `*.dousic.media` host** (CSP-allowed). Typically `wss://live.dousic.media/WebRTCAppEE/websocket`. |
+| **`stream_id`** | string | ✅ | Ant Media stream key to play. |
+| `token` | string | | One-time play token if the stream is token-protected (Ant Media JWT/one-time token). Empty string if the app/stream is public. |
+| `ice_servers` | array | ▲ | STUN/TURN servers in standard `RTCIceServer` form (`{urls, username?, credential?}`). **Strongly recommended** — TVs are usually behind NAT and need a TURN relay. Omit and the app uses a public STUN only (LAN-only reachability). |
+
+> **Fallback contract:** the app tries WebRTC first for sub-second latency; if
+> no media arrives within ~6s or ICE fails, it silently switches to the HLS
+> `url`. Always send a working HLS fallback so live plays on restrictive
+> networks where WebRTC/UDP is blocked.
 
 ### 4.4 User
 - `GET /user/watchlist` → `{ "items": [ content items ] }`
@@ -361,6 +400,25 @@ not bundle hls.js. webOS plays HLS through the TV's native pipeline. Therefore:
 2. **Direct files:** `.mp4` (`protocol:"video"`) / `.mp3` (`protocol:"audio"`)
    also work; serve over HTTPS with `Accept-Ranges: bytes` for seeking.
 3. **DRM:** out of scope for the first submission — ship unencrypted, `drm_scheme:null`.
+
+### 5.1 Live via Ant Media (WebRTC ultra-low-latency)
+
+For **live** content the app can play Ant Media's WebRTC output for sub-second
+latency on the TV, with automatic HLS fallback. This is the customary,
+cert-friendly path for LG (native `<video>` + WebRTC; no third-party player
+plugin). The **full backend spec is in `docs/BACKEND_ANTMEDIA.md`** — summary:
+
+- Return `protocol:"webrtc"` + the `webrtc` object (§4.3) from
+  `/content/{id}/stream` **only while the stream is actually live**. When the
+  broadcast ends, revert to VOD (`protocol:"hls"`) pointing at the recording.
+- **Signaling host must be `wss://*.dousic.media`** (put Ant Media behind
+  `live.dousic.media` via reverse proxy / DNS) so it clears the app CSP.
+- Provide **TURN** (UDP + TCP/443 fallback) — TVs are behind NAT and consumer
+  routers often block plain UDP; without a reachable TURN relay WebRTC won't
+  connect and every session degrades to HLS.
+- Always include a valid HLS **fallback** manifest in `url`.
+- If a stream is token-protected, mint a **one-time play token** per stream
+  request and return it in `webrtc.token`.
 
 ---
 

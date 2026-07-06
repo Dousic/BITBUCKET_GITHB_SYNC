@@ -20,6 +20,16 @@
       or future subdomain (api, staging, ws, auth, pair, ...) without
       revisiting CSP on every backend route addition.
 
+      Ant Media WebRTC live: the signaling WebSocket runs over
+      wss://*.dousic.media (already covered above). WebRTC ICE (STUN/TURN)
+      connections are governed by connect-src in Chromium, so the
+      stun:/stuns:/turn:/turns: schemes are allowed to let the TV reach
+      Ant Media's STUN/TURN relays. Scheme-only sources (no host) permit any
+      host on that scheme — acceptable here because ICE candidate hosts are
+      negotiated dynamically and Ant Media may relay through its own TURN
+      infra on non-dousic hosts. If WebRTC is blocked the player falls back
+      to the HLS manifest, so this never breaks live playback.
+
       'unsafe-eval' is removed — React 18 production builds do not eval
       strings at runtime. Enact's dev server needs it, but `enact pack -p`
       does not. Re-add it ONLY if a runtime regression surfaces and you
@@ -43,7 +53,8 @@
                  https://dousic.media
                  https://*.dousic.media
                  wss://*.dousic.media
-                 https://*.dousic-cdn.com;
+                 https://*.dousic-cdn.com
+                 stun: stuns: turn: turns:;
                img-src 'self' https: data: blob:;
                style-src 'self' 'unsafe-inline';
                font-src 'self' data:;
