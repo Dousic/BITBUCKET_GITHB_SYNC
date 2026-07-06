@@ -336,6 +336,13 @@ export const content = {
 		return request('GET', '/content/home');
 	},
 
+	// Social feed (Feed tab). `params` may include tab (for_you|following|live|
+	// local), genre, and pagination. Mirrors dousic.media/feed.
+	async getFeed (params = {}) {
+		const qs = new URLSearchParams(params).toString();
+		return request('GET', `/content/feed${qs ? '?' + qs : ''}`);
+	},
+
 	async getBrowse (params = {}) {
 		const qs = new URLSearchParams(params).toString();
 		return request('GET', `/content/browse${qs ? '?' + qs : ''}`);
@@ -370,6 +377,24 @@ export const content = {
 };
 
 export const user = {
+	// Full profile for the account view — bio, role, location, follower/
+	// following counts, interests, usage (storage/livestream). Mirrors
+	// dousic.media/profile. Non-fatal: the panel falls back to the basic
+	// /auth/me user object when fields are absent.
+	async getProfile () {
+		return request('GET', '/user/profile');
+	},
+
+	async getFollowers (params = {}) {
+		const qs = new URLSearchParams(params).toString();
+		return request('GET', `/user/followers${qs ? '?' + qs : ''}`);
+	},
+
+	async getFollowing (params = {}) {
+		const qs = new URLSearchParams(params).toString();
+		return request('GET', `/user/following${qs ? '?' + qs : ''}`);
+	},
+
 	async getWatchlist () {
 		return request('GET', '/user/watchlist');
 	},

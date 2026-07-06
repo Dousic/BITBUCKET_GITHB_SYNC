@@ -41,6 +41,7 @@ export default {
 	// Nav
 	nav: {
 		home:    () => $L('Home'),
+		feed:    () => $L('Feed'),
 		browse:  () => $L('Browse'),
 		live:    () => $L('Live'),
 		search:  () => $L('Search'),
@@ -63,6 +64,20 @@ export default {
 		play:              () => $L('Play'),
 		watchLive:         () => $L('Watch live'),
 		moreInfo:          () => $L('More info')
+	},
+
+	// Feed
+	feed: {
+		eyebrow:    () => $L('Discover'),
+		title:      () => $L('Feed'),
+		forYou:     () => $L('For You'),
+		following:  () => $L('Following'),
+		liveTab:    () => $L('Live'),
+		local:      () => $L('Local'),
+		emptyTitle: () => $L('Nothing in your feed yet'),
+		emptyBody:  () => $L('Follow creators or switch tabs to see posts here.'),
+		liveNow:    () => $L('Live now'),
+		watching:   (n) => $L('{count} watching').replace('{count}', n)
 	},
 
 	// Browse
@@ -110,7 +125,24 @@ export default {
 		emptyMessage:    () => $L('Add content to your watchlist, and your recently watched shows up here.'),
 		guestPromptTitle:   () => $L('Sign in to save your content'),
 		guestPromptMessage: () => $L('Create a free account to keep a watchlist, resume across devices, and follow your favorite creators.'),
-		settings:        () => $L('Settings')
+		settings:        () => $L('Settings'),
+		// Complete profile (mirrors dousic.media/profile)
+		followers:       () => $L('Followers'),
+		following:       () => $L('Following'),
+		tabAbout:        () => $L('About'),
+		tabContent:      () => $L('Content'),
+		tabCollection:   () => $L('Collection'),
+		about:           () => $L('About'),
+		interests:       () => $L('Interests'),
+		storageUsage:    () => $L('Storage'),
+		livestreamUsage: () => $L('Livestreaming'),
+		remaining:       (p) => $L('{pct} remaining').replace('{pct}', p),
+		noContent:       () => $L('No content yet'),
+		noCollection:    () => $L('No collection yet'),
+		noPeople:        () => $L('Nobody here yet'),
+		member:          () => $L('Member'),
+		follow:          () => $L('Follow'),
+		followingBtn:    () => $L('Following')
 	},
 
 	// Player

@@ -498,10 +498,14 @@ curl -sI "https://cdn.dousic-cdn.com/hls/c_123/master.m3u8" | grep -i "content-t
 | GET  | `/content/browse` | yes | `{items, genres}` |
 | GET  | `/content/live` | yes | `{items}` |
 | GET  | `/content/search?q=` | yes | `{results}` |
+| GET  | `/content/feed?tab=` | yes | `{items}` (feed posts — see below) |
 | GET  | `/content/{id}` | yes | detail object |
 | GET  | `/content/{id}/stream` | yes | `{url, protocol, drm_scheme, drm_license_url}` |
 | GET  | `/creators` | yes | `{items}` |
 | GET  | `/creators/{handle}` | yes | creator detail |
+| GET  | `/user/profile` | yes | full profile — see below |
+| GET  | `/user/followers` | yes | `{items}` (people) |
+| GET  | `/user/following` | yes | `{items}` (people) |
 | GET  | `/user/watchlist` | yes | `{items}` |
 | POST | `/user/watchlist` | yes | `{ok}` |
 | DELETE | `/user/watchlist/{id}` | yes | `{ok}` |
@@ -510,3 +514,51 @@ curl -sI "https://cdn.dousic-cdn.com/hls/c_123/master.m3u8" | grep -i "content-t
 | POST | `/telemetry/events` | yes | `2xx` (optional) |
 
 All paths are under `https://api.dousic.media/api/webos/v1`.
+
+### Appendix B — Feed & Profile (added for the Feed tab + complete Profile)
+
+**`GET /content/feed?tab=<for_you|following|live|local>&genre=<>`** → `{ "items": [post] }`.
+The app reads each post tolerantly (aliases in parentheses):
+```json
+{
+  "id": "p_1",
+  "content_id": "c_123",                       // what selecting the post opens
+  "creator": { "display_name": "Kenny Mo", "handle": "kennymo", "avatar_url": "https://…" },
+  "meta": "now · Houston",                      // small line under the name (posted_at_label)
+  "caption": "Friday Night Sessions — live ⚡",  // (text | description)
+  "title": "Friday Night Sessions",
+  "subtitle": "Live DJ set · 3 cameras",        // (duration_label)
+  "type": "audio",                              // audio | video | art | podcast … (media_type | kind)
+  "is_live": true,
+  "viewer_count": 1240,
+  "thumbnail_url": "https://…",                 // media preview (any artwork alias)
+  "tag": "Live",                                // optional pill label; defaults from type/is_live
+  "likes": 1200, "comments": 418                // (like_count | comment_count)
+}
+```
+- `tab` filters the feed server-side (`following` = creators the user follows, `live` = live only,
+  `local` = same region). Selecting a post → the app opens `content_id` (live → player, else detail).
+
+**`GET /user/profile`** → the full account profile:
+```json
+{
+  "display_name": "Kenny Mo", "handle": "kennymo",
+  "avatar_url": "https://…",
+  "role": "Singer · Producer",                  // (creator_type | title)
+  "location": "Houston, TX",                    // (city)
+  "followers_count": 12400, "following_count": 318,   // (or counts:{followers,following})
+  "bio": "Houston-based artist…",               // (about)
+  "interests": ["🎵 Electronic", "🎧 Lo-fi"],
+  "collection": [ /* content items (editions/NFTs) */ ],
+  "usage": {
+    "storage_used_label": "3 GB", "storage_total_label": "5 GB", "storage_pct": 60,
+    "livestream_used_label": "22 min", "livestream_total_label": "60 min", "livestream_pct": 37
+  }
+}
+```
+- Every field is optional — the Profile falls back to `/auth/me` + watchlist/history and hides
+  sections it has no data for. `storage_pct`/`livestream_pct` may be sent directly, or the app
+  computes them from `*_used`/`*_total` numbers.
+
+**`GET /user/followers`** and **`GET /user/following`** → `{ "items": [person] }` where a person is
+`{ id, display_name, handle, role, avatar_url, is_following }`.

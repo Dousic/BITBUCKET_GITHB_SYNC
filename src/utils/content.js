@@ -85,6 +85,67 @@ export const toCardProps = (item = {}) => ({
 	isFree: item.is_free ?? item.isFree ?? item.free
 });
 
+// Deterministic gradient for an avatar/media placeholder, derived from a
+// string so the same creator always gets the same colors (no Math.random,
+// which is unavailable in some sandboxes and would flicker between renders).
+const GRADIENTS = [
+	['#DD1C78', '#D91CDD'],
+	['#D91CDD', '#DD1C78'],
+	['#FF8000', '#FFD200'],
+	['#0FBF6F', '#DD1C78'],
+	['#D91CDD', '#7b2ff7'],
+	['#DD1C78', '#a01060']
+];
+export const gradientFor = (seed = '') => {
+	let h = 0;
+	for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) & 0xffff;
+	const [a, b] = GRADIENTS[h % GRADIENTS.length];
+	return `linear-gradient(135deg, ${a}, ${b})`;
+};
+
+// Two-letter avatar initials from a name/handle.
+export const initialsFor = (name = '') => {
+	const parts = String(name).replace(/^@/, '').trim().split(/[\s._-]+/).filter(Boolean);
+	if (!parts.length) return 'D';
+	return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+};
+
+/**
+ * Normalize a raw feed entry (dousic.media/feed post) to the shape FeedPost
+ * renders. Tolerates the various field names the API may use.
+ * @param {object} p
+ * @returns {object}
+ */
+export const toFeedPost = (p = {}) => {
+	const creator = p.creator || p.author || {};
+	const name = (typeof creator === 'string' ? creator : creator.display_name || creator.name) || p.name || 'Creator';
+	const handle = (typeof creator === 'object' ? creator.handle : null) || p.handle || '';
+	const live = isLiveItem(p);
+	const type = (p.type || p.media_type || p.kind || '').toString().toLowerCase();
+	return {
+		id: p.id,
+		name,
+		handle,
+		avatarUrl: (typeof creator === 'object' && (creator.avatar_url || creator.avatar)) || p.avatar_url,
+		initials: initialsFor(name || handle),
+		avatarGradient: gradientFor(handle || name),
+		meta: p.meta || p.posted_at_label || p.timeago || p.time || '',
+		caption: p.caption || p.text || p.description || p.title || '',
+		title: p.title || p.track_title || '',
+		subtitle: p.subtitle || p.duration_label || '',
+		thumbnailUrl: resolveThumbnail(p),
+		mediaGradient: gradientFor(p.title || p.id || name),
+		isLive: live,
+		isAudio: type === 'audio',
+		type,
+		tag: p.tag || (live ? 'Live' : (type ? type.charAt(0).toUpperCase() + type.slice(1) : '')),
+		viewerCount: p.viewer_count ?? p.viewerCount,
+		likes: p.likes ?? p.like_count,
+		comments: p.comments ?? p.comment_count,
+		contentId: p.content_id || p.id
+	};
+};
+
 /**
  * Normalize a list payload to an array, whatever envelope the backend wraps it
  * in (bare array, or {items|featured|hero|results|data}).

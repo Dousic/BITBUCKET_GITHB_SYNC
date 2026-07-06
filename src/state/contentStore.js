@@ -64,6 +64,26 @@ export const useContentStore = create((set, get) => ({
 		}
 	},
 
+	// ----- Social feed -----
+	feed: null,
+	isLoadingFeed: false,
+
+	loadFeed: async (params = {}, force = false) => {
+		const cached = get().feed;
+		const sameParams = cached && JSON.stringify(cached.params) === JSON.stringify(params);
+		if (!force && sameParams && !isStale(cached)) return cached.data;
+
+		set({isLoadingFeed: true});
+		try {
+			const data = await content.getFeed(params);
+			set({feed: {data, params, fetchedAt: Date.now()}, isLoadingFeed: false});
+			return data;
+		} catch (err) {
+			set({error: err.message, isLoadingFeed: false});
+			throw err;
+		}
+	},
+
 	loadLive: async (filter = {}, force = false) => {
 		const cached = get().live;
 		if (!force && !isStale(cached)) return cached.data;

@@ -27,7 +27,7 @@
 import {create} from 'zustand';
 import telemetry from '../platform/telemetry';
 
-const ROOT_VIEWS = ['home', 'browse', 'live', 'search', 'profile'];
+const ROOT_VIEWS = ['home', 'feed', 'browse', 'live', 'search', 'profile'];
 
 // Unique frame ID generator. Date.now() handles cross-session uniqueness;
 // the monotonic counter handles same-ms collisions (which CAN happen on

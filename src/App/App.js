@@ -40,6 +40,7 @@ import {APP_VERSION} from '../version';
 
 // Views
 import HomePanel from '../views/HomePanel';
+import FeedPanel from '../views/FeedPanel';
 import BrowsePanel from '../views/BrowsePanel';
 import LivePanel from '../views/LivePanel';
 import SearchPanel from '../views/SearchPanel';
@@ -67,6 +68,7 @@ installOkKeyHandler();
 
 const VIEW_COMPONENTS = {
 	home: HomePanel,
+	feed: FeedPanel,
 	browse: BrowsePanel,
 	live: LivePanel,
 	search: SearchPanel,
@@ -82,7 +84,7 @@ const VIEW_COMPONENTS = {
 // page keeps the nav (matching dousic.media, where the item page still shows
 // the top nav). Only the full-screen player and the modal login hide it.
 // "Shows the nav" is a UI concern, named separately from the nav stack.
-const NAV_VIEWS = new Set(['home', 'browse', 'live', 'search', 'profile', 'content-detail']);
+const NAV_VIEWS = new Set(['home', 'feed', 'browse', 'live', 'search', 'profile', 'content-detail']);
 
 const AppBase = () => {
 	// Platform state

@@ -32,6 +32,7 @@ import css from './NavBar.module.less';
 // Labels are functions so they re-evaluate after locale change.
 const NAV_ITEMS = [
 	{id: 'home',    label: () => Strings.nav.home(),    icon: 'home'},
+	{id: 'feed',    label: () => Strings.nav.feed(),    icon: 'feed'},
 	{id: 'browse',  label: () => Strings.nav.browse(),  icon: 'browse'},
 	{id: 'live',    label: () => Strings.nav.live(),    icon: 'live'},
 	{id: 'search',  label: () => Strings.nav.search(),  icon: 'search'},
@@ -44,6 +45,7 @@ const NAV_ITEMS = [
 // repaint on focus — leaving items blank and selection ambiguous.
 const ICON_PATHS = {
 	home: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
+	feed: 'M4 5h16v3H4zm0 5.5h16v3H4zm0 5.5h10v3H4z',
 	browse: 'M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z',
 	search: 'M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 5 1.49-1.49zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z',
 	profile: 'M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'
